@@ -16,18 +16,24 @@ Přihlašení uživatelé můžou mezi sebou chatovat v lokálním chatu. Tento 
 
 # 3. Seznam úkolů a jejich přiřazení členům týmu
 *	**Zadání úlohy:**
-	* S
+	* Tomáš Augustin
 *	**Use Case diagram:**
-	* S
+	* Andrei Nechiporuk
 *	**Class Diagram:**
-	* S
+	* Tomáš Augustin
+	* Andrei Nechiporuk
 *	**Specifikace případů užití:**
-	* s
+	* Andrei Nechiporuk
+	* Adam Šindler
+	* Jakub Vojta
 *	**Flow Diagram:**
-	* S
+	* Eduard Wolf
 *	**Návrhy UI:**
-	* S
+	* Adam Šindler
+	* Erich Pross
 *	**Návrh databáze:**
-	* s
+	* Tomáš Augustin
+	* Eduard Wolf
 *	**Testovací případy:**
-	* s
+	* Erich Pross
+	* Jakub Vojta
