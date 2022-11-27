@@ -2,12 +2,12 @@
 # Anotace:  
 Aplikace pro přidávání filmů do uživatelských katalogů a jejich prohlížení.   
 #  Členové týmu 
-*	Adam Šindler
-*	Andrei Nechiporuk.
-*	Eduard Wolf
-*	Erich Pross
-*	Jakub Vojta
-*	Tomáš Augustin 
+* Adam Šindler(sina07)
+* Andrei Nechiporuk(neca02)
+* Eduard Wolf(wole00)
+* Erich Pross(proe11)
+* Jakub Vojta(vojj08)
+* Tomáš Augustin(augt00)
 
 # Zadání úlohy
 Aplikace slouží pro výběr filmů z databáze, registrovaný a příhlášený uživatel si může vybraný film přidat do svého filmového listu. V tomto listu si přihlášený uživatel může film nastavit do jedné z tří kategorii a to "Plánuji sledovat", "Sleduji", "Hotovo".   
