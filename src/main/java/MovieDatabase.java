@@ -19,12 +19,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
-import javax.xml.XMLConstants;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-import javax.xml.validation.Validator;
+
 /*
 umožňuje uživatelům se přihlásit a zobrazit seznam filmů. Poskytuje přihlašovací formulář, který přijímá uživatelské jméno a heslo a pokouší
 se je porovnat s položkou v seznamu uživatelů. Pokud je přihlášení úspěšné, je aktuální uživatel uložen a uživateli je zobrazena databáze filmů.
@@ -43,7 +40,7 @@ public class MovieDatabase extends Application {
 
     // idea ukazuje ze currentUser neni pouzity ale NEMAZAT
     private User currentUser;
-
+    private boolean pridani;
 
     public static void main(String[] args) {
         launch(args);
@@ -158,23 +155,32 @@ public class MovieDatabase extends Application {
         hodnoceniInput.setPromptText("Hodnoceni");
 
         Button addButton = new Button("Přidat");
+
+
         addButton.setOnAction(event -> {
             // Vytvoření nového filmu se vstupními hodnotami
             Movie movie = new Movie(titleInput.getText(), Integer.parseInt(yearInput.getText()), directorInput.getText(), Float.parseFloat(hodnoceniInput.getText()));
-
-            // Přidat film do seznamu
-            movies.add(movie);
-            saveMovies();
-
 
             // Vymazání vstupních polí
             titleInput.clear();
             yearInput.clear();
             directorInput.clear();
             hodnoceniInput.clear();
-
             // Aktualizujte tabulku tak, aby zobrazovala nově přidaný film
             movieTable.setItems(FXCollections.observableArrayList(movies));
+            if (pridani==true){
+                movies.add(movie);
+                saveMovies();
+            }
+            if (pridani==false){
+
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("Špatný film");
+                alert.setContentText("Vytovřený film není správný, prosím zkontroluj a zkus to znova ");
+
+                alert.showAndWait();
+            }
         });
 
         HBox addMovieForm = new HBox(titleInput, yearInput, directorInput, hodnoceniInput,addButton);
@@ -185,7 +191,7 @@ public class MovieDatabase extends Application {
         logoutButton.setOnAction(event -> {
             // Vymazání aktuálního uživatele a zobrazení přihlašovacího formuláře
             currentUser = null;
-            stop();
+
             start(stage);
         });
 
@@ -237,10 +243,13 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
         }
     }
 
+   /*
     public void stop() {
         // Uloží filmy do XML souboru
         saveMovies();
     }
+
+    */
 
 
     private void saveMovies() {
@@ -255,6 +264,7 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
             Validator validator = schema.newValidator();
             // samotna validace XML dokumentu pomoci XSD schematu
             validator.validate(new StreamSource(new File("src/main/resources/movies.xml")));
+            pridani = true;
             System.out.println("Validace problěha úspěšně");
         } catch (IOException e) {
             e.printStackTrace();
