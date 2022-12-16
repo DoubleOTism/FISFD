@@ -8,6 +8,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="fisfd" />
         <module name="prototyp" />
+        <module name="fisfdproto" />
         <module name="movie-db" />
       </profile>
     </annotationProcessing>

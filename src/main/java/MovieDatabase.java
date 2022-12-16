@@ -104,7 +104,7 @@ public class MovieDatabase extends Application {
         directorColumn.setCellValueFactory(new PropertyValueFactory<>("director"));
 
         TableColumn<Movie, Integer> ratingColumn = new TableColumn<>("Hodnocení");
-        ratingColumn.setCellValueFactory(new PropertyValueFactory<>("averageRating"));
+        ratingColumn.setCellValueFactory(new PropertyValueFactory<>("hodnoceni"));
 
         movieTable.getColumns().addAll(titleColumn, yearColumn, directorColumn, ratingColumn);
 
@@ -119,7 +119,9 @@ public class MovieDatabase extends Application {
             List<Movie> filteredMovies = movies.stream()
                     .filter(movie -> movie.getTitle().contains(newValue) ||
                             Integer.toString(movie.getYear()).contains(newValue) ||
+                            Float.toString(movie.getHodnoceni()).contains(newValue) ||
                             movie.getDirector().contains(newValue))
+
                     .collect(Collectors.toList());
 
             // Nastavení položek v tabulce na filtrovaný seznam filmů
@@ -139,10 +141,13 @@ public class MovieDatabase extends Application {
         TextField directorInput = new TextField();
         directorInput.setPromptText("Režisér");
 
+        TextField hodnoceniInput = new TextField();
+        hodnoceniInput.setPromptText("Hodnoceni");
+
         Button addButton = new Button("Přidat");
         addButton.setOnAction(event -> {
             // Vytvoření nového filmu se vstupními hodnotami
-            Movie movie = new Movie(titleInput.getText(), Integer.parseInt(yearInput.getText()), directorInput.getText());
+            Movie movie = new Movie(titleInput.getText(), Integer.parseInt(yearInput.getText()), directorInput.getText(), Float.parseFloat(hodnoceniInput.getText()));
 
             // Přidat film do seznamu
             movies.add(movie);
@@ -151,12 +156,13 @@ public class MovieDatabase extends Application {
             titleInput.clear();
             yearInput.clear();
             directorInput.clear();
+            hodnoceniInput.clear();
 
             // Aktualizujte tabulku tak, aby zobrazovala nově přidaný film
             movieTable.setItems(FXCollections.observableArrayList(movies));
         });
 
-        HBox addMovieForm = new HBox(titleInput, yearInput, directorInput, addButton);
+        HBox addMovieForm = new HBox(titleInput, yearInput, directorInput, hodnoceniInput,addButton);
         addMovieForm.setSpacing(10);
 
         // Vytvoření tlačítka pro odhlášení

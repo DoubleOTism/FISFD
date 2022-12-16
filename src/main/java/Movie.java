@@ -12,17 +12,22 @@ public class Movie {
     @JacksonXmlProperty(localName = "director")
     private String director;
 
+    @JacksonXmlProperty(localName = "rating")
+    private float hodnoceni;
+
     // NEMAZAT!!
     public Movie() {
         // Výchozí konstruktor, který Jackson potřebuje pro deserializaci
 
     }
 
-    public Movie(String title, int year, String director) {
+    public Movie(String title, int year, String director, float hodnoceni) {
         this.title = title;
         this.year = year;
         this.director = director;
+        this.hodnoceni = hodnoceni;
     }
+
 
     public String getTitle() {
         return title;
@@ -40,6 +45,9 @@ public class Movie {
         this.year = year;
     }
 
+    public float getHodnoceni() {return hodnoceni;}
+
+    public void setHodnoceni(float hodnoceni) {this.hodnoceni=hodnoceni;}
     public String getDirector() {
         return director;
     }
