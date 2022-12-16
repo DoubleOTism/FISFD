@@ -8,11 +8,23 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import org.xml.sax.SAXException;
+
+import javax.xml.XMLConstants;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.xml.XMLConstants;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
 /*
 umožňuje uživatelům se přihlásit a zobrazit seznam filmů. Poskytuje přihlašovací formulář, který přijímá uživatelské jméno a heslo a pokouší
 se je porovnat s položkou v seznamu uživatelů. Pokud je přihlášení úspěšné, je aktuální uživatel uložen a uživateli je zobrazena databáze filmů.
@@ -31,6 +43,7 @@ public class MovieDatabase extends Application {
 
     // idea ukazuje ze currentUser neni pouzity ale NEMAZAT
     private User currentUser;
+
 
     public static void main(String[] args) {
         launch(args);
@@ -191,10 +204,22 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
 
     private void loadMovies() {
         XmlMapper xmlMapper = new XmlMapper();
+// zde probiha pre-validace pred spustenim aplikace, zdali XML dokument splnuje xsd schema
         try {
             movies = xmlMapper.readValue(MOVIES_FILE, xmlMapper.getTypeFactory().constructCollectionType(List.class, Movie.class));
+            // vytvoreni schemafactory a schema objekt
+            SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            Schema schema = schemaFactory.newSchema(new File("src/main/resources/movies.xsd"));
+            // vytvoeni objektu pro Validator
+            Validator validator = schema.newValidator();
+            // samotna validace XML dokumentu pomoci XSD schematu
+            validator.validate(new StreamSource(new File("src/main/resources/movies.xml")));
+            System.out.println("Validace problěha úspěšně");
+
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (SAXException e) {
+            throw new RuntimeException(e);
         }
     }
     private void loadUsers() {

@@ -1,6 +1,7 @@
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
+
 @JacksonXmlRootElement(localName = "movie")
 public class Movie {
     @JacksonXmlProperty(localName = "title")
@@ -10,10 +11,11 @@ public class Movie {
     private int year;
 
     @JacksonXmlProperty(localName = "director")
-    private String director;
 
+    private String director;
     @JacksonXmlProperty(localName = "rating")
     private float hodnoceni;
+
 
     // NEMAZAT!!
     public Movie() {
@@ -54,5 +56,7 @@ public class Movie {
 
     public void setDirector(String director) {
         this.director = director;
+
     }
+
 }
