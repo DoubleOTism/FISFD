@@ -1,0 +1,16 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="ArrayList" type="ArrayListType"/>
+    <xs:complexType name="ArrayListType">
+        <xs:sequence>
+            <xs:element name="item" type="ItemType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="ItemType">
+        <xs:sequence>
+            <xs:element name="title" type="xs:string"/>
+            <xs:element name="year" type="xs:int"/>
+            <xs:element name="director" type="xs:string"/>
+            <xs:element name="rating" type="xs:float"/>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>
