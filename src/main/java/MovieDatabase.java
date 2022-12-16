@@ -241,8 +241,19 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
         XmlMapper xmlMapper = new XmlMapper();
         try {
             xmlMapper.writeValue(MOVIES_FILE, movies);
+            movies = xmlMapper.readValue(MOVIES_FILE, xmlMapper.getTypeFactory().constructCollectionType(List.class, Movie.class));
+            // vytvoreni schemafactory a schema objekt
+            SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            Schema schema = schemaFactory.newSchema(new File("src/main/resources/movies.xsd"));
+            // vytvoeni objektu pro Validator
+            Validator validator = schema.newValidator();
+            // samotna validace XML dokumentu pomoci XSD schematu
+            validator.validate(new StreamSource(new File("src/main/resources/movies.xml")));
+            System.out.println("Validace problěha úspěšně");
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (SAXException e) {
+            throw new RuntimeException(e);
         }
     }
     private void saveUsers() {
