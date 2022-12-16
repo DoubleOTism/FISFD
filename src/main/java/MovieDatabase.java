@@ -164,6 +164,8 @@ public class MovieDatabase extends Application {
 
             // Přidat film do seznamu
             movies.add(movie);
+            saveMovies();
+
 
             // Vymazání vstupních polí
             titleInput.clear();
