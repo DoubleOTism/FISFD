@@ -10,7 +10,13 @@
             <xs:element name="title" type="xs:string"/>
             <xs:element name="year" type="xs:int"/>
             <xs:element name="director" type="xs:string"/>
-            <xs:element name="rating" type="xs:float"/>
-        </xs:sequence>
+            <xs:element name="rating" type="xs:float">
+                <xs:simpleType>
+                    <xs:restriction base="xs:float">
+                        <xs:minInclusive value="0"/>
+                        <xs:maxInclusive value="5"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>        </xs:sequence>
     </xs:complexType>
 </xs:schema>

@@ -221,7 +221,11 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
         } catch (IOException e) {
             e.printStackTrace();
         } catch (SAXException e) {
-            throw new RuntimeException(e);
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("An error occurred");
+            alert.setContentText("Něco je špatně v databázi! ");
+            alert.showAndWait();
         }
     }
     private void loadUsers() {
@@ -255,7 +259,15 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
         } catch (IOException e) {
             e.printStackTrace();
         } catch (SAXException e) {
-            throw new RuntimeException(e);
+            // create and show error alert
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Špatný film");
+            alert.setContentText("Vytovřený film není správný, prosím zkontroluj a zkus to znova ");
+
+            alert.showAndWait();
+
+            //throw new RuntimeException(e);
         }
     }
     private void saveUsers() {
