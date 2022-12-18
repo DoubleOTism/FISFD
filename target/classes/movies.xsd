@@ -1,22 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
     <xs:element name="ArrayList" type="ArrayListType"/>
     <xs:complexType name="ArrayListType">
         <xs:sequence>
-            <xs:element name="item" type="ItemType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="movie" type="movieType" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
-    <xs:complexType name="ItemType">
+    <xs:element name="movie" type="movieType"/>
+    <xs:complexType name="movieType">
         <xs:sequence>
             <xs:element name="title" type="xs:string"/>
             <xs:element name="year" type="xs:int"/>
             <xs:element name="director" type="xs:string"/>
-            <xs:element name="rating" type="xs:float">
+            <xs:element name="rating">
                 <xs:simpleType>
                     <xs:restriction base="xs:float">
                         <xs:minInclusive value="0"/>
                         <xs:maxInclusive value="5"/>
                     </xs:restriction>
                 </xs:simpleType>
-            </xs:element>        </xs:sequence>
+            </xs:element>
+
+        </xs:sequence>
     </xs:complexType>
 </xs:schema>

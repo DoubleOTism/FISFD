@@ -1,3 +1,4 @@
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -17,9 +18,9 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 /*
@@ -154,32 +155,26 @@ public class MovieDatabase extends Application {
         TextField hodnoceniInput = new TextField();
         hodnoceniInput.setPromptText("Hodnoceni");
 
-        Button addButton = new Button("Přidat");
-
-
+        Button addButton = new Button("Add Movie");
         addButton.setOnAction(event -> {
             // Vytvoření nového filmu se vstupními hodnotami
             Movie movie = new Movie(titleInput.getText(), Integer.parseInt(yearInput.getText()), directorInput.getText(), Float.parseFloat(hodnoceniInput.getText()));
 
-            // Vymazání vstupních polí
-            titleInput.clear();
-            yearInput.clear();
-            directorInput.clear();
-            hodnoceniInput.clear();
-            // Aktualizujte tabulku tak, aby zobrazovala nově přidaný film
-            movieTable.setItems(FXCollections.observableArrayList(movies));
-            if (pridani==true){
+            try {
+                validateMovieAgainstXsd(movie);
+                // Přidání filmu do seznamu filmů
                 movies.add(movie);
-                saveMovies();
-            }
-            if (pridani==false){
-
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Error");
-                alert.setHeaderText("Špatný film");
-                alert.setContentText("Vytovřený film není správný, prosím zkontroluj a zkus to znova ");
-
-                alert.showAndWait();
+                // Vymazání vstupních polí
+                titleInput.clear();
+                yearInput.clear();
+                directorInput.clear();
+                hodnoceniInput.clear();
+                // Aktualizujte tabulku tak, aby zobrazovala nově přidaný film
+                movieTable.setItems(FXCollections.observableArrayList(movies));
+            } catch (SAXException | IOException e) {
+                // Zobrazte chybové hlášení
+                Alert alert = new Alert(Alert.AlertType.ERROR, "Film se nepodařilo přidat do databáze: " + e.getMessage());
+                alert.show();
             }
         });
 
@@ -203,6 +198,34 @@ public class MovieDatabase extends Application {
         stage.setScene(new Scene(container));
         stage.show();
     }
+
+
+    // validace proti XSD souboru
+    private void validateMovieAgainstXsd(Movie movie) throws SAXException, IOException {
+        // Vytovreni schema factory co vytvori schema z XSD souboru
+        SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        Schema schema = factory.newSchema(new StreamSource(new File("src/main/resources/movies.xsd")));
+        Validator validator = schema.newValidator();
+
+        // vytvoreni xmlmapper pro prevedeni Movie na XML string (bez pretvoreni na string to nejde)
+        XmlMapper xmlMapper = new XmlMapper();
+        String xml = xmlMapper.writeValueAsString(movie);
+
+        // valiadce nove vytvoreneho XML stringu vuci nasemu schematu
+        validator.validate(new StreamSource(new StringReader(xml)));
+
+        // nacteni existujiciho xml souboru (jinak se bude zapisovat pouze jeden film)
+        List<Movie> existingMovies = xmlMapper.readValue(MOVIES_FILE, xmlMapper.getTypeFactory().constructCollectionType(List.class, Movie.class));
+        // pridani noveho filmu do listu
+        existingMovies.add(movie);
+
+        // zapsani noveho filmu do XML
+        xmlMapper.writeValue(MOVIES_FILE, existingMovies);
+    }
+
+
+
+
 /*
 Metody loadMovies a loadUsers slouží k načtení seznamu filmů a uživatelů ze souborů XML, ve kterých jsou uloženy.
 Třída XmlMapper se používá k analýze dat XML a vytvoření objektů Seznam filmů nebo Uživatelé. Metoda constructCollectionType
@@ -212,27 +235,12 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
 
     private void loadMovies() {
         XmlMapper xmlMapper = new XmlMapper();
-// zde probiha pre-validace pred spustenim aplikace, zdali XML dokument splnuje xsd schema
         try {
             movies = xmlMapper.readValue(MOVIES_FILE, xmlMapper.getTypeFactory().constructCollectionType(List.class, Movie.class));
-            // vytvoreni schemafactory a schema objekt
-            SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            Schema schema = schemaFactory.newSchema(new File("src/main/resources/movies.xsd"));
-            // vytvoeni objektu pro Validator
-            Validator validator = schema.newValidator();
-            // samotna validace XML dokumentu pomoci XSD schematu
-            validator.validate(new StreamSource(new File("src/main/resources/movies.xml")));
-            System.out.println("Validace problěha úspěšně");
-
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (SAXException e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText("An error occurred");
-            alert.setContentText("Něco je špatně v databázi! ");
-            alert.showAndWait();
         }
+
     }
     private void loadUsers() {
         XmlMapper xmlMapper = new XmlMapper();

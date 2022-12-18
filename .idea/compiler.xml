@@ -6,11 +6,11 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="fisfd" />
-        <module name="prototyp" />
-        <module name="fisfdproto" />
-        <module name="movie-db" />
+        <module name="fisfd2" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="fisfd2" target="8" />
+    </bytecodeTargetLevel>
   </component>
 </project>
