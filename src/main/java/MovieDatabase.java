@@ -1,4 +1,5 @@
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -53,23 +54,31 @@ public class MovieDatabase extends Application {
         loadMovies();
         loadUsers();
 
+showLoginForm(stage);
+        stage.show();
 
-// Vytvoření login fieldu
+
+
+    }
+
+
+    // vytvoření showLoginForm pro login uživatelů
+    private void showLoginForm(Stage stage) {
+        // Create login form elements
         TextField usernameInput = new TextField();
         usernameInput.setPromptText("Username");
 
         PasswordField passwordInput = new PasswordField();
-        passwordInput.setPromptText("Password");
-
-
-        /*
+        passwordInput.setPromptText("Heslo");
+         /*
         Metoda setOnAction tlačítka loginButton slouží k určení event handler, která se zavolá po kliknutí na tlačítko.
         Event handler zkontroluje, zda jsou zadané uživatelské jméno a heslo správné, a to tak, že filtruje seznam uživatelů a
         vyhledá uživatele se zadaným uživatelským jménem a heslem. Pokud je uživatel nalezen, je pole currentUser nastaveno na
         tohoto uživatele a zobrazí se databáze filmů. Pokud není nalezen žádný uživatel, zobrazí se chybová zpráva.
         Uživatel se tak může přihlásit do aplikace a získat přístup k databázi filmů.
          */
-        Button loginButton = new Button("Login");
+
+        Button loginButton = new Button("Přihlášení");
         loginButton.setOnAction(event -> {
             // Kontrola zdali je username a password spravne
             User user = users.stream()
@@ -98,8 +107,8 @@ public class MovieDatabase extends Application {
         // Nastavení scény a zobrazení přihlašovacího formuláře
         stage.setScene(new Scene(loginForm));
         stage.show();
-
     }
+
 
     private void showMovieDatabase(Stage stage) {
         // Vytvoření tabulky filmů
@@ -139,9 +148,6 @@ public class MovieDatabase extends Application {
             movieTable.setItems(FXCollections.observableArrayList(filteredMovies));
         });
 
-
-
-
         // Vytvoření formuláře pro přidání filmu
         TextField titleInput = new TextField();
         titleInput.setPromptText("Název");
@@ -152,12 +158,22 @@ public class MovieDatabase extends Application {
         TextField directorInput = new TextField();
         directorInput.setPromptText("Režisér");
 
+        // Vytvoření ChoiceBox pro volbu, zda má být film ohodnocen
+        ChoiceBox<String> hasRatingChoiceBox = new ChoiceBox<>(FXCollections.observableArrayList("Yes", "No"));
+        hasRatingChoiceBox.getSelectionModel().select(1);
+
         TextField hodnoceniInput = new TextField();
         hodnoceniInput.setPromptText("Hodnoceni");
 
         Button addButton = new Button("Add Movie");
         addButton.setOnAction(event -> {
             // Vytvoření nového filmu se vstupními hodnotami
+            // Získání hodnocení filmu
+            String hasRating = hasRatingChoiceBox.getSelectionModel().getSelectedItem();
+            float rating = 0;
+            if (hasRating.equals("Yes")) {
+                rating = Float.parseFloat(hodnoceniInput.getText());
+            }
             Movie movie = new Movie(titleInput.getText(), Integer.parseInt(yearInput.getText()), directorInput.getText(), Float.parseFloat(hodnoceniInput.getText()));
 
             try {
@@ -178,8 +194,33 @@ public class MovieDatabase extends Application {
             }
         });
 
-        HBox addMovieForm = new HBox(titleInput, yearInput, directorInput, hodnoceniInput,addButton);
+        // Tlačítko pro odebrání filmu
+        Button deleteButton = new Button("Odstranit");
+        deleteButton.setOnAction(event -> {
+            Movie vybranejFilm = movieTable.getSelectionModel().getSelectedItem();
+
+            if (vybranejFilm != null) {
+                /*confirmation box pro overeni odstraneni filmu po ok se vybrany film odstrani z movies a nasledne se zavola metoda deleteMovies() ktera zmenu zapise do XML souboru
+                a nasledne metoda loadMovies() ktera nacte zmenu ,
+                nasledne se updatne movieTable (table se vseme filmama) aby odpovidal aktualnimu stavu XML.
+                (todo: hodit to do jedny metody;)
+                 */
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Jste si jisti, že chcete tento film odstranit?");
+                alert.showAndWait().ifPresent(response -> {
+                    if (response == ButtonType.OK) {
+                        System.out.println("Odstranit");
+                        movies.remove(vybranejFilm);
+                        deleteMovies();
+                        loadMovies();
+                        movieTable.setItems(FXCollections.observableArrayList(movies));
+                    }
+                });
+            }
+        });
+
+        HBox addMovieForm = new HBox(titleInput, yearInput, directorInput,hasRatingChoiceBox, hodnoceniInput,addButton, deleteButton);
         addMovieForm.setSpacing(10);
+
 
         // Vytvoření tlačítka pro odhlášení
         Button logoutButton = new Button("Odhlášení");
@@ -197,6 +238,8 @@ public class MovieDatabase extends Application {
         // Nastavení scény a zobrazení filmové databáze
         stage.setScene(new Scene(container));
         stage.show();
+
+
     }
 
 
@@ -251,13 +294,20 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
         }
     }
 
-   /*
-    public void stop() {
-        // Uloží filmy do XML souboru
-        saveMovies();
+
+    private void deleteMovies() {
+        XmlMapper xmlMapper = new XmlMapper();
+        try {
+            // Write the updated list back to the file
+
+            xmlMapper.writeValue(MOVIES_FILE, movies);
+            // Reload the movies list
+
+        } catch (IOException e) {
+            System.out.println("Error deleting movie from file: " + e.getMessage());
+        }
     }
 
-    */
 
 
     private void saveMovies() {
@@ -265,28 +315,11 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
         try {
             xmlMapper.writeValue(MOVIES_FILE, movies);
             movies = xmlMapper.readValue(MOVIES_FILE, xmlMapper.getTypeFactory().constructCollectionType(List.class, Movie.class));
-            // vytvoreni schemafactory a schema objekt
-            SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            Schema schema = schemaFactory.newSchema(new File("src/main/resources/movies.xsd"));
-            // vytvoeni objektu pro Validator
-            Validator validator = schema.newValidator();
-            // samotna validace XML dokumentu pomoci XSD schematu
-            validator.validate(new StreamSource(new File("src/main/resources/movies.xml")));
-            pridani = true;
-            System.out.println("Validace problěha úspěšně");
+
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (SAXException e) {
-            // create and show error alert
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText("Špatný film");
-            alert.setContentText("Vytovřený film není správný, prosím zkontroluj a zkus to znova ");
-
-            alert.showAndWait();
-
-            //throw new RuntimeException(e);
         }
+
     }
     private void saveUsers() {
         try {
@@ -331,8 +364,15 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
                 showMovieDatabase(stage);
             }
         });
+        // Tlačitko na vrácení do login formuláře
+        Button backButton = new Button("Back");
+        backButton.setOnAction(event -> {
+            // Create a new scene for the login form
+            showLoginForm(stage);
+        });
 
-        VBox registrationForm = new VBox(usernameInput, passwordInput, registerButton);
+
+        VBox registrationForm = new VBox(usernameInput, passwordInput, registerButton, backButton);
         registrationForm.setSpacing(10);
         registrationForm.setPadding(new Insets(10));
 

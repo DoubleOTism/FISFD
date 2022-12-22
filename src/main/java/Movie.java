@@ -1,3 +1,4 @@
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
@@ -14,6 +15,7 @@ public class Movie {
 
     private String director;
     @JacksonXmlProperty(localName = "rating")
+    @JsonProperty(required = false)
     private float hodnoceni;
 
 
