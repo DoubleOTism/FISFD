@@ -10,12 +10,12 @@
     
     <build>
         <resources>
-            
             <resource>
                 <directory>src/main/resources</directory>
                 <includes>
                     <include>**/*</include>
                 </includes>
+                <targetPath>src/main/resources</targetPath>
             </resource>
         </resources>
 
@@ -34,9 +34,7 @@
                         <manifest>
                             <mainClass>MovieDatabase</mainClass>
                         </manifest>
-                        
                     </archive>
-                    
                 </configuration>
                 <executions>
                     <execution>
