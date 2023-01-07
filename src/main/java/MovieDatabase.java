@@ -35,16 +35,9 @@ režiséra. Uživatel také může vyhledávat filmy podle názvu a filtrovat v�
  */
 public class MovieDatabase extends Application {
     // Soubor, ve kterém budou filmy a uživatelé uloženy
-  //  private static final File MOVIES_FILE = new File("src/main/resources/movies.xml");
-  //  private static final File USERS_FILE = new File("src/main/resources/users.xml");
-/*
-Změna načítání souboru ze statického File na více flexibilní alternativě pomocí getResource kvůli generování .jar
-*/
-    URL moviesUrl = getClass().getResource("/movies.xml");
-    File MOVIES_FILE = new File(moviesUrl.getFile());
 
-    URL usersUrl = getClass().getResource("/users.xml");
-    File USERS_FILE = new File(usersUrl.getFile());
+    private static final File MOVIES_FILE = new File("src/main/resources/movies.xml");
+    private static final File USERS_FILE = new File("src/main/resources/users.xml");
 
 
     // list filmů a uživatelů
