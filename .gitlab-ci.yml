@@ -6,6 +6,6 @@ java-build:
   stage: build
   script:
     - mvn clean package
-    artifacts:
+  artifacts:
     paths:
     - target/*.jar
