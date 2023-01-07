@@ -20,6 +20,9 @@ import javax.xml.validation.Validator;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,8 +35,31 @@ režiséra. Uživatel také může vyhledávat filmy podle názvu a filtrovat v�
  */
 public class MovieDatabase extends Application {
     // Soubor, ve kterém budou filmy a uživatelé uloženy
-    private static final File MOVIES_FILE = new File("src/main/resources/movies.xml");
-    private static final File USERS_FILE = new File("src/main/resources/users.xml");
+  //  private static final File MOVIES_FILE = new File("src/main/resources/movies.xml");
+  //  private static final File USERS_FILE = new File("src/main/resources/users.xml");
+/*
+Změna načítání souboru ze statického File na více flexibilní alternativě pomocí getResource kvůli generování .jar
+*/
+    URL moviesUrl = getClass().getResource("/movies.xml");
+    File MOVIES_FILE;
+
+    {
+        try {
+            MOVIES_FILE = new File(moviesUrl.toURI());
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+    }
+    URL usersUrl = getClass().getResource("/users.xml");
+    File USERS_FILE;
+
+    {
+        try {
+            USERS_FILE = new File(usersUrl.toURI());
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+    }
 
     // list filmů a uživatelů
     private List<Movie> movies = new ArrayList<>();
@@ -247,7 +273,13 @@ showLoginForm(stage);
     private void validateMovieAgainstXsd(Movie movie) throws SAXException, IOException {
         // Vytovreni schema factory co vytvori schema z XSD souboru
         SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        Schema schema = factory.newSchema(new StreamSource(new File("src/main/resources/movies.xsd")));
+        Schema schema = null;
+        try {
+            schema = factory.newSchema(new StreamSource(getClass().getResource("/movies.xsd").toURI().toString()));
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        //Schema schema = factory.newSchema(new StreamSource(new File("src/main/resources/movies.xsd")));
         Validator validator = schema.newValidator();
 
         // vytvoreni xmlmapper pro prevedeni Movie na XML string (bez pretvoreni na string to nejde)

@@ -34,16 +34,9 @@
                         <manifest>
                             <mainClass>MovieDatabase</mainClass>
                         </manifest>
-                        <manifestEntries>
-                            <Class-Path>src/main/resources/</Class-Path>
-                        </manifestEntries>
+                        
                     </archive>
-                    <files>
-                        <file>
-                            <source>src/main/resources</source>
-                            <outputDirectory>/</outputDirectory>
-                        </file>
-                    </files>
+                    
                 </configuration>
                 <executions>
                     <execution>
