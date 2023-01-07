@@ -40,11 +40,11 @@ public class MovieDatabase extends Application {
 /*
 Změna načítání souboru ze statického File na více flexibilní alternativě pomocí getResource kvůli generování .jar
 */
-    URL moviesUrl = getClass().getResource("/movies.xml");
-    File MOVIES_FILE = new File(moviesUrl.toURI());
+    URL moviesUrl = getClass().getResource("movies.xml");
+    File MOVIES_FILE = new File(moviesUrl.getFile());
 
-    URL usersUrl = getClass().getResource("/users.xml");
-    File USERS_FILE = new File(usersUrl.toURI());
+    URL usersUrl = getClass().getResource("users.xml");
+    File USERS_FILE = new File(usersUrl.getFile());
 
 
     // list filmů a uživatelů
@@ -262,7 +262,7 @@ showLoginForm(stage);
     private void validateMovieAgainstXsd(Movie movie) throws SAXException, IOException, URISyntaxException {
         // Vytovreni schema factory co vytvori schema z XSD souboru
         SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        Schema schema = factory.newSchema(new StreamSource(getClass().getResource("/movies.xsd").toURI().toString()));
+        Schema schema = factory.newSchema(new StreamSource(getClass().getResource("movies.xsd").getFile()));
         //Schema schema = factory.newSchema(new StreamSource(new File("src/main/resources/movies.xsd")));
         Validator validator = schema.newValidator();
 
