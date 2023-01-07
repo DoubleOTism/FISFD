@@ -41,25 +41,11 @@ public class MovieDatabase extends Application {
 Změna načítání souboru ze statického File na více flexibilní alternativě pomocí getResource kvůli generování .jar
 */
     URL moviesUrl = getClass().getResource("/movies.xml");
-    File MOVIES_FILE;
+    File MOVIES_FILE = new File(moviesUrl.toURI());
 
-    {
-        try {
-            MOVIES_FILE = new File(moviesUrl.toURI());
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-    }
     URL usersUrl = getClass().getResource("/users.xml");
-    File USERS_FILE;
+    File USERS_FILE = new File(usersUrl.toURI());
 
-    {
-        try {
-            USERS_FILE = new File(usersUrl.toURI());
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-    }
 
     // list filmů a uživatelů
     private List<Movie> movies = new ArrayList<>();
@@ -69,6 +55,9 @@ Změna načítání souboru ze statického File na více flexibilní alternativ�
     // idea ukazuje ze currentUser neni pouzity ale NEMAZAT
     private User currentUser;
     private boolean pridani;
+
+    public MovieDatabase() throws URISyntaxException {
+    }
 
     public static void main(String[] args) {
         launch(args);
@@ -213,7 +202,7 @@ showLoginForm(stage);
                 hodnoceniInput.clear();
                 // Aktualizujte tabulku tak, aby zobrazovala nově přidaný film
                 movieTable.setItems(FXCollections.observableArrayList(movies));
-            } catch (SAXException | IOException e) {
+            } catch (SAXException | IOException | URISyntaxException e) {
                 // Zobrazte chybové hlášení
                 Alert alert = new Alert(Alert.AlertType.ERROR, "Film se nepodařilo přidat do databáze: " + e.getMessage());
                 alert.show();
@@ -270,15 +259,10 @@ showLoginForm(stage);
 
 
     // validace proti XSD souboru
-    private void validateMovieAgainstXsd(Movie movie) throws SAXException, IOException {
+    private void validateMovieAgainstXsd(Movie movie) throws SAXException, IOException, URISyntaxException {
         // Vytovreni schema factory co vytvori schema z XSD souboru
         SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        Schema schema = null;
-        try {
-            schema = factory.newSchema(new StreamSource(getClass().getResource("/movies.xsd").toURI().toString()));
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
+        Schema schema = factory.newSchema(new StreamSource(getClass().getResource("/movies.xsd").toURI().toString()));
         //Schema schema = factory.newSchema(new StreamSource(new File("src/main/resources/movies.xsd")));
         Validator validator = schema.newValidator();
 
