@@ -15,6 +15,7 @@
                 <includes>
                     <include>**/*</include>
                 </includes>
+                <filtering>false</filtering>
             </resource>
         </resources>
 
@@ -31,7 +32,11 @@
                         <manifest>
                             <mainClass>MovieDatabase</mainClass>
                         </manifest>
-            </archive>
+                    </archive>
+                    <outputDirectory>${project.build.directory}</outputDirectory>
+                    <includes>
+                        <include>**/*</include>
+                    </includes>
                 </configuration>
                 <executions>
                     <execution>
