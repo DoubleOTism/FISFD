@@ -4,20 +4,29 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.xml.sax.SAXException;
+import javafx.scene.image.Image ;
 
+import javax.swing.text.LabelView;
 import javax.xml.XMLConstants;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
+import java.awt.*;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringReader;
 
@@ -108,12 +117,23 @@ showLoginForm(stage);
 
         Button registerButton = new Button("Registrace");
         registerButton.setOnAction(event -> showRegistrationForm(stage));
-        VBox loginForm = new VBox(usernameInput, passwordInput, loginButton, registerButton);
+
+        Image image = new Image("file:src/main/resources/logo.png");
+        ImageView imageView = new ImageView(image);
+        imageView.setFitWidth(150);
+        imageView.setFitHeight(50);
+
+        Label label = new Label("Přihlásit se");
+        label.setStyle("-fx-font-weight: bold;");
+        VBox loginForm = new VBox(label,imageView,usernameInput, passwordInput, loginButton, registerButton);
+
         loginForm.setSpacing(10);
         loginForm.setPadding(new Insets(10));
+        loginForm.setAlignment(Pos.CENTER);
 
         // Nastavení scény a zobrazení přihlašovacího formuláře
         stage.setScene(new Scene(loginForm));
+        stage.getIcons().add(image);
         stage.show();
     }
 
@@ -380,13 +400,23 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
             showLoginForm(stage);
         });
 
+        Image image = new Image("file:src/main/resources/logo.png");
+        ImageView imageView = new ImageView(image);
+        imageView.setFitWidth(150);
+        imageView.setFitHeight(50);
 
-        VBox registrationForm = new VBox(usernameInput, passwordInput, registerButton, backButton);
+        Label label = new Label("Registrovat se");
+        label.setStyle("-fx-font-weight: bold;");
+
+        VBox registrationForm = new VBox(label,imageView,usernameInput, passwordInput, registerButton, backButton);
         registrationForm.setSpacing(10);
         registrationForm.setPadding(new Insets(10));
+        registrationForm.setAlignment(Pos.CENTER);
+
 
         // Nastavení scény a zobrazení registračního formuláře
         stage.setScene(new Scene(registrationForm));
+        stage.getIcons().add(image);
         stage.show();
     }
 
