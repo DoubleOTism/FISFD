@@ -1,5 +1,3 @@
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -7,8 +5,14 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.xml.sax.SAXException;
 
@@ -17,12 +21,11 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
+import java.io.*;
 
 import java.net.URISyntaxException;
-import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,12 +41,15 @@ public class MovieDatabase extends Application {
 
     private static final File MOVIES_FILE = new File("src/main/resources/movies.xml");
     private static final File USERS_FILE = new File("src/main/resources/users.xml");
+    private static final File REVIEW_FILE = new File("src/main/resources/review.xml");
 
 
     // list filmů a uživatelů
     private List<Movie> movies = new ArrayList<>();
 
     private List<User> users = new ArrayList<>();
+
+    private List<Review> reviews = new ArrayList<>();
 
     // idea ukazuje ze currentUser neni pouzity ale NEMAZAT
     private User currentUser;
@@ -61,8 +67,8 @@ public class MovieDatabase extends Application {
         // načte filmy a uživatele z XML souborů
         loadMovies();
         loadUsers();
-
-showLoginForm(stage);
+        loadReviews();
+        showLoginForm(stage);
         stage.show();
 
 
@@ -201,6 +207,15 @@ showLoginForm(stage);
                 alert.show();
             }
         });
+        // Tlacitko pro zobrazeni uzivatelskeho panelu
+        Button userPanelButton = new Button("Zobrazit panel uzivatele");
+        userPanelButton.setOnAction(event -> {
+            try {
+                showUserPanelStage(stage);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
 
         // Tlačítko pro odebrání filmu
         Button deleteButton = new Button("Odstranit");
@@ -239,7 +254,7 @@ showLoginForm(stage);
             start(stage);
         });
 
-        VBox container = new VBox(movieTable, searchBar, addMovieForm, logoutButton);
+        VBox container = new VBox(movieTable, searchBar, addMovieForm, logoutButton, userPanelButton);
         container.setSpacing(10);
         container.setPadding(new Insets(10));
 
@@ -303,6 +318,15 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
         }
     }
 
+    private void loadReviews() {
+        XmlMapper xmlMapper = new XmlMapper();
+        try {
+            reviews = xmlMapper.readValue(REVIEW_FILE, xmlMapper.getTypeFactory().constructCollectionType(List.class, Review.class));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     private void deleteMovies() {
         XmlMapper xmlMapper = new XmlMapper();
@@ -338,7 +362,121 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
             e.printStackTrace();
         }
     }
+    // Uživatelský panel, sloužící pro nastavení účtu.
+    private void showUserPanelStage (Stage stage) throws IOException {
 
+        // Zavedeni okna, uvitani uzivatele, vykresleni prvku
+        BorderPane borderPaneUserPanel = new BorderPane();
+        Scene userScene = new Scene(borderPaneUserPanel);
+        borderPaneUserPanel.setPrefSize(800,600);
+        borderPaneUserPanel.setPadding(new Insets(10));
+        Image imageUser = new Image(Files.newInputStream(Paths.get("src/main/resources/userimage.png")));
+        ImageView usersImage = new ImageView(imageUser);
+        usersImage.setFitHeight(150);
+        usersImage.setFitWidth(150);
+        VBox leftPanelUser = new VBox();
+        Label labelUserPanel = new Label("Vítej, " + currentUser.getUsername());
+        labelUserPanel.setFont(Font.font("Arial", FontWeight.BOLD, 25));
+
+        //Výpis recenzí pro daného uživatele, pracuje se souborem review.xml, informace o uživateli zjišťuje pomocí lognutého jména.
+        TableView<Review> usersReviews = new TableView<>();
+        TableColumn<Review, String> reviewColumn = new TableColumn<>("Recenze");
+        reviewColumn.setCellValueFactory(new PropertyValueFactory<>("textRecenze"));
+        TableColumn<Review, String> userColumn = new TableColumn<>("Uživatel");
+        userColumn.setCellValueFactory(new PropertyValueFactory<>("revUser"));
+        TableColumn<Review, String> revMovieColumn = new TableColumn<>("Film");
+        revMovieColumn.setCellValueFactory(new PropertyValueFactory<>("reviewedMovie"));
+        TableColumn<Review, String> ratingColumn = new TableColumn<>("Hodnoceni");
+        ratingColumn.setCellValueFactory(new PropertyValueFactory<>("revHodnoceni"));
+        usersReviews.getColumns().setAll(reviewColumn, userColumn, revMovieColumn, ratingColumn);
+        usersReviews.setItems(FXCollections.observableArrayList(reviews));
+        String user = currentUser.getUsername();
+        System.out.println(user);
+        List<Review> filteredReviews = reviews.stream().filter(review -> review.getRevUser().contains(user)).collect(Collectors.toList());
+        usersReviews.setItems(FXCollections.observableArrayList(filteredReviews));
+
+        //Tlačítko pro změnu hesla
+        Button changePasswordButton = new Button("Změna hesla");
+        changePasswordButton.setOnAction(event -> {
+            changePasswordScene(stage);
+        });
+
+        Button goToMainStage = new Button("Zpět do hlavního menu");
+        goToMainStage.setOnAction(event -> {
+            showMovieDatabase(stage);
+        });
+
+
+
+
+        // Přidání všech elementů na stránku
+        leftPanelUser.setPadding(new Insets(10));
+        leftPanelUser.getChildren().setAll(usersImage, labelUserPanel, changePasswordButton, goToMainStage);
+        borderPaneUserPanel.setLeft(leftPanelUser);
+        borderPaneUserPanel.setCenter(usersReviews);
+        stage.setScene(userScene);
+
+    }
+    //Otevře nové okno určené pro změnu hesla
+    private void changePasswordScene(Stage stage) {
+        BorderPane borderPaneChangePassword = new BorderPane();
+        Scene changePasswordScene = new Scene(borderPaneChangePassword);
+        borderPaneChangePassword.setPrefSize(400,400);
+        borderPaneChangePassword.setPadding(new Insets(10));
+        VBox changePasswordVBox = new VBox();
+        HBox changePasswordHBox = new HBox();
+        Stage changePasswordStage = new Stage();
+        changePasswordStage.setScene(changePasswordScene);
+
+        Label changePasswordTopLabel = new Label("Změna hesla");
+        changePasswordTopLabel.setFont(Font.font("Arial", FontWeight.BOLD, 25));
+        Button changePasswordButtonBack = new Button("Zpět");
+        Button changePasswordButtonCommit = new Button("Změnit heslo");
+        PasswordField changePasswordOldPass = new PasswordField();
+        PasswordField changePasswordNewPass = new PasswordField();
+        PasswordField changePasswordNewPassConf = new PasswordField();
+        Label changePasswordOldPassLabel = new Label("Staré heslo");
+        Label changePasswordNewPassLabel = new Label("Nové heslo");
+        Label changePasswordNewPassConfLabel = new Label("Nové heslo znovu");
+        changePasswordHBox.getChildren().setAll(changePasswordButtonBack, changePasswordButtonCommit);
+        changePasswordVBox.getChildren().setAll(changePasswordTopLabel, changePasswordOldPassLabel, changePasswordOldPass,  changePasswordNewPassLabel, changePasswordNewPass, changePasswordNewPassConfLabel, changePasswordNewPassConf, changePasswordHBox);
+
+        changePasswordButtonBack.setOnAction(event -> {
+            changePasswordStage.close();
+        });
+
+        changePasswordButtonCommit.setOnAction(event -> {
+            if (changePasswordOldPass.getText().equals(currentUser.getPassword())){
+                if (changePasswordNewPass.getText().equals(changePasswordNewPassConf.getText())) {
+                    if (changePasswordNewPass.getText().equals("")){
+                        Alert alertNoPass = new Alert(Alert.AlertType.ERROR, "Nové heslo nesmí být prázdné.");
+                        alertNoPass.show();
+
+                    } else {
+                        User user = currentUser;
+                        user.setUsername(currentUser.getUsername());
+                        user.setPassword(changePasswordNewPass.getText());
+                        saveUsers();
+                        Alert alertNewPass = new Alert(Alert.AlertType.INFORMATION, "Změna hesla provedena úspěšně, přihlas se.");
+                        alertNewPass.show();
+                        changePasswordStage.close();
+                        start(stage);
+
+                    }
+                } else {
+                    Alert alertNotMatchingPass = new Alert(Alert.AlertType.ERROR, "Nová hesla se neshodují.");
+                    alertNotMatchingPass.show();
+                }
+            } else {
+                Alert alertWrongOldPass = new Alert(Alert.AlertType.ERROR, "Staré heslo se neshoduje.");
+                alertWrongOldPass.show();}
+        });
+
+        borderPaneChangePassword.setCenter(changePasswordVBox);
+        changePasswordStage.initModality(Modality.APPLICATION_MODAL);
+        changePasswordStage.show();
+
+    }
     private void showRegistrationForm(Stage stage) {
         // Vytvoření registračního formuláře
         TextField usernameInput = new TextField();
@@ -350,15 +488,24 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
 
         Button registerButton = new Button("Registrace");
         registerButton.setOnAction(event -> {
-            //  Zkontrolujte, zda je zadané uživatelské jméno již obsazeno.
+
             boolean usernameTaken = users.stream()
                     .anyMatch(u -> u.getUsername().equals(usernameInput.getText()));
-
-            if (usernameTaken) {
-                // Pokud je uživatelské jméno obsazeno, zobrazí se chybová zpráva.
-                Alert alert = new Alert(Alert.AlertType.ERROR, "Uživatelské jméno je již obsazeno");
-                alert.show();
+            //  Kontrola uzivatelskeho jmena, zda neni prazdne
+            if(usernameInput.getText().equals("")) {
+                Alert alertNothing = new Alert(Alert.AlertType.ERROR, "Uživatelské jméno nesmí být prázdné.");
+                alertNothing.show();
             } else {
+                //  Zkontrolujte, zda je zadané uživatelské jméno již obsazeno.
+                if (passwordInput.getText().equals("")){
+                    Alert alertNoPass = new Alert(Alert.AlertType.ERROR, "Uživatelské heslo nesmí být prázdné.");
+                    alertNoPass.show();
+                } else {
+                    if (usernameTaken) {
+                // Pokud je uživatelské jméno obsazeno, zobrazí se chybová zpráva.
+                Alert alert = new Alert(Alert.AlertType.ERROR, "Uživatelské jméno je již obsazeno.");
+                alert.show();
+                } else {
                 // Pokud uživatelské jméno není obsazeno, přidejte nového uživatele do seznamu uživatelů.
                 User user = new User();
                 user.setUsername(usernameInput.getText());
@@ -371,8 +518,10 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
 
                 // Zobrazit databázi filmů
                 showMovieDatabase(stage);
-            }
+            }}}
         });
+
+
         // Tlačitko na vrácení do login formuláře
         Button backButton = new Button("Back");
         backButton.setOnAction(event -> {

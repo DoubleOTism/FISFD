@@ -1,0 +1,26 @@
+<ArrayList>
+    <item>
+        <reviewedMovie>český film</reviewedMovie>
+        <revUser>Jan</revUser>
+        <textRecenze>Tento film je good, doporucuji</textRecenze>
+        <revHodnoceni>3.5</revHodnoceni>
+    </item>
+    <item>
+        <reviewedMovie>český film</reviewedMovie>
+        <revUser>Jan</revUser>
+        <textRecenze>Tento film je good, doporucuji2</textRecenze>
+        <revHodnoceni>3.5</revHodnoceni>
+    </item>
+    <item>
+        <reviewedMovie>český film</reviewedMovie>
+        <revUser>Jan</revUser>
+        <textRecenze>Tento film je good, doporucuji3</textRecenze>
+        <revHodnoceni>3.5</revHodnoceni>
+    </item>
+    <item>
+        <reviewedMovie>český film</reviewedMovie>
+        <revUser>alice</revUser>
+        <textRecenze>Tento film je good, doporucuji4</textRecenze>
+        <revHodnoceni>3.5</revHodnoceni>
+    </item>
+</ArrayList>
