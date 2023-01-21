@@ -395,6 +395,7 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
 
         //Load obrazku uzivatele, pokud neni zadny obrazek definovany uzivatelem, nacte default obrazek.
         Image imageUser = null;
+
         try {
             imageUser = new Image(new FileInputStream("src/main/resources/" +currentUser.getUsername()+ ".png"));
         } catch (FileNotFoundException e) {
@@ -619,9 +620,11 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
 
                 // Uložení aktualizovaného seznamu uživatelů do souboru XML
                 saveUsers();
-
-                // Zobrazit databázi filmů
-                showMovieDatabase(stage);
+                //Zpráva o úspěšné registraci
+                        Alert alertRegistrationComplete = new Alert(Alert.AlertType.INFORMATION, "Registrace byla úspěšná, přihlas se pomocí svých zadaných údajů.");
+                        alertRegistrationComplete.show();
+                // Zobrazení login obrazovky
+                start(stage);
             }}}
         });
 
