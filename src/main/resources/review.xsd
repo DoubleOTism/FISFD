@@ -3,37 +3,38 @@
     <xs:element name="ArrayList" type="ArrayListType"/>
     <xs:complexType name="ArrayListType">
         <xs:sequence>
-            <xs:element name="movie" type="movieType" maxOccurs="unbounded"/>
+            <xs:element name="review" type="reviewType" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
-    <xs:element name="movie" type="movieType"/>
-    <xs:complexType name="movieType">
-
+    <xs:element name="review" type="reviewType"/>
+    
+    <xs:complexType name="reviewType">
         <xs:sequence>
-            <xs:element name="title" minOccurs="1">
+            <xs:element name="reviewedMovie" minOccurs="1">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
                         <xs:pattern value="[0-9ěščřžýáíéóúůďťňĎŇŤŠČŘŽÝÁÍÉÚŮĚÓa-zA-Z -,. ]{0,30}"/>
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
-            <xs:element name="year" minOccurs="1">
-                <xs:simpleType>
-                    <xs:restriction base="xs:gYear">
-                        <xs:minInclusive value="1920"/>
-                    </xs:restriction>
-                </xs:simpleType>
-            </xs:element>
-
-            <xs:element name="director" minOccurs="1">
+            
+            <xs:element name="revUser" minOccurs="1">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:maxLength value="50" />
+                        <xs:pattern value="[0-9ěščřžýáíéóúůďťňĎŇŤŠČŘŽÝÁÍÉÚŮĚÓa-zA-Z -,. ]{0,30}"/>
                     </xs:restriction>
                 </xs:simpleType>
-
             </xs:element>
-            <xs:element name="rating" minOccurs="0">
+            
+            <xs:element name="textRecenze" minOccurs="1">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:pattern value="[0-9ěščřžýáíéóúůďťňĎŇŤŠČŘŽÝÁÍÉÚŮĚÓa-zA-Z -,. ]{0,100}"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            
+            <xs:element name="revHodnoceni" minOccurs="0">
                 <xs:simpleType>
                     <xs:restriction base="xs:float">
                         <xs:minInclusive value="0"/>
@@ -41,15 +42,6 @@
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
-            
-            <xs:element name="info" minOccurs="0">
-                <xs:simpleType>
-                    <xs:restriction base="xs:string">
-                        <xs:pattern value="[0-9ěščřžýáíéóúůďťňĎŇŤŠČŘŽÝÁÍÉÚŮĚÓa-zA-Z -,. ]{0,300}"/>
-                    </xs:restriction>
-                </xs:simpleType>
-            </xs:element>
-
         </xs:sequence>
     </xs:complexType>
 </xs:schema>

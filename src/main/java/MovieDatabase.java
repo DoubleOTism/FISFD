@@ -342,6 +342,28 @@ public class MovieDatabase extends Application {
         xmlMapper.writeValue(MOVIES_FILE, existingMovies);
     }
 
+    private void validateReviewAgainstXsd(Review review) throws SAXException, IOException, URISyntaxException {
+        // Vytovreni schema factory co vytvori schema z XSD souboru
+        SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        Schema schema = factory.newSchema(new StreamSource(Objects.requireNonNull(getClass().getResource("src/main/resources/review.xsd")).getFile()));
+        Validator validator = schema.newValidator();
+
+        // vytvoreni xmlmapper pro prevedeni Movie na XML string (bez pretvoreni na string to nejde)
+        XmlMapper xmlMapper = new XmlMapper();
+        String xml = xmlMapper.writeValueAsString(review);
+
+        // valiadce nove vytvoreneho XML stringu vuci nasemu schematu
+        validator.validate(new StreamSource(new StringReader(xml)));
+
+        // nacteni existujiciho xml souboru (jinak se bude zapisovat pouze jeden film)
+        List<Review> existingReviews = xmlMapper.readValue(REVIEW_FILE, xmlMapper.getTypeFactory().constructCollectionType(List.class, Review.class));
+        // pridani noveho filmu do listu
+        existingReviews.add(review);
+
+        // zapsani noveho filmu do XML
+        xmlMapper.writeValue(REVIEW_FILE, existingReviews);
+    }
+
 
 
 
@@ -415,7 +437,7 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
         }
     }
     // Slouží pro zobrazení infa o filmu, uživatel dostane image, info filmu, recenze filmu, basic úpdaje o lidech, co to vytvořili.
-    private void showMovieDetails (Stage stage) throws IOException {
+    public void showMovieDetails (Stage stage) throws IOException {
         BorderPane borderPaneMovieDetail = new BorderPane();
         borderPaneMovieDetail.setMinSize(800,600);
         borderPaneMovieDetail.setPadding(new Insets(10));
@@ -486,6 +508,10 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
             System.gc();
         });
         //Tlačítko pro vytvoření recenze k filmu
+        Button addReview = new Button("Přidat recenzi");
+        addReview.setOnAction(event -> {
+            showAddReviewStage(stage);
+        });
 
 
         // Vytvořžení Labelu o informacich filmu, nastavení maximální šířky pro wrapper, nastavení HBoxu a věcí kolem
@@ -504,7 +530,7 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
         movieDetailLeftBox.getChildren().addAll(movieImage, director, movieDirector, year, movieYear);
         movieDetailLeftBox.setPadding(new Insets(0,10,0,0));
         movieDetailsVBox.getChildren().addAll(infoLabel, movieDetailReview);
-        movieDetailHBox.getChildren().addAll(backFromDetail, changePicture);
+        movieDetailHBox.getChildren().addAll(backFromDetail, changePicture, addReview);
         HBox hBoxTop = new HBox(movieDetailLabel);
         infoLabel.setPadding(new Insets(0,0,10,0));
 
@@ -518,6 +544,74 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
         stage.setScene(movieScene);
 
 
+    }
+
+    public void showAddReviewStage (Stage stage) {
+        BorderPane borderPaneAddReview = new BorderPane();
+        borderPaneAddReview.setMinSize(400,300);
+        borderPaneAddReview.setPadding(new Insets(10));
+        Scene movieScene = new Scene(borderPaneAddReview);
+        Stage reviewStage = new Stage();
+        VBox reviewVBox = new VBox();
+        HBox reviewHBox = new HBox();
+        Label labelTop = new Label("Přidání recenze pro "+ currentMovieString);
+        labelTop.setFont(Font.font("Arial", FontWeight.BOLD, 25));
+
+        Button goBackButton = new Button("Zrušit");
+        goBackButton.setOnAction(event -> {
+            reviewStage.close();
+        });
+
+        // Vytvoření formuláře pro přidání filmu
+        TextArea textRecenzeInput = new TextArea();
+        textRecenzeInput.setPromptText("Text vaší recenze");
+
+        Label hodnoceniFilmu = new Label("Bodové hodnocení filmu: ");
+
+        Slider revHodnoceniSlider = new Slider(0.0,5.0,0);
+        revHodnoceniSlider.setBlockIncrement(0.5);
+        revHodnoceniSlider.setShowTickLabels(true);
+        revHodnoceniSlider.setSnapToTicks(true);
+        revHodnoceniSlider.setMajorTickUnit(0.5);
+        revHodnoceniSlider.setMinorTickCount(0);
+        revHodnoceniSlider.setShowTickMarks(true);
+
+
+        Button addButton = new Button("Přidat recenzi");
+        addButton.setOnAction(event -> {
+            // Vytvoření nového filmu se vstupními hodnotami
+            Double doubleToFloat = revHodnoceniSlider.getValue();
+            Float convertedDouble = doubleToFloat.floatValue();
+
+            Review review = new Review(currentMovieString, currentUser.getUsername(), textRecenzeInput.getText(), convertedDouble);
+
+            try {
+                validateReviewAgainstXsd(review);
+                // Přidání filmu do seznamu filmů
+                reviews.add(review);
+                // Vymazání vstupních polí
+                textRecenzeInput.clear();
+                Alert alertCorrect = new Alert(Alert.AlertType.INFORMATION, "Recenzi se podařilo přidat do databáze");
+                alertCorrect.show();
+                reviewStage.close();
+                showMovieDetails(stage);
+            } catch (SAXException | IOException | URISyntaxException e) {
+                // Zobrazte chybové hlášení
+                Alert alert = new Alert(Alert.AlertType.ERROR, "Recenzi se nepodařilo přidat do databáze: " + e.getMessage());
+                alert.show();
+            }
+        });
+        textRecenzeInput.setMinSize(360,200);
+        hodnoceniFilmu.setPadding(new Insets(0,0,20,0));
+        reviewHBox.getChildren().setAll(goBackButton, addButton);
+        reviewVBox.getChildren().setAll(textRecenzeInput,hodnoceniFilmu, revHodnoceniSlider);
+        borderPaneAddReview.setTop(labelTop);
+        labelTop.setAlignment(Pos.CENTER);
+        reviewHBox.setAlignment(Pos.CENTER);
+        borderPaneAddReview.setCenter(reviewVBox);
+        borderPaneAddReview.setBottom(reviewHBox);
+        reviewStage.setScene(movieScene);
+        reviewStage.show();
     }
 
 
