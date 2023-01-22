@@ -283,7 +283,7 @@ public class MovieDatabase extends Application {
         xButton.setFitWidth(21);
         xButton.setLayoutX(611);
         xButton.setLayoutY(8);
-        Image image1 = new Image(getClass().getResourceAsStream("xButton.png"));
+        Image image1 = new Image(getClass().getResourceAsStream("src/main/resources/xButton.png"));
         xButton.setImage(image1);
 
         ImageView searchIcon = new ImageView();
@@ -291,7 +291,7 @@ public class MovieDatabase extends Application {
         searchIcon.setFitWidth(14);
         searchIcon.setLayoutX(113);
         searchIcon.setLayoutY(15);
-        Image image2 = new Image(getClass().getResourceAsStream("searchIcon.png"));
+        Image image2 = new Image(getClass().getResourceAsStream("src/main/resources/searchIcon.png"));
         searchIcon.setImage(image2);
 
         ImageView profile = new ImageView();
@@ -299,7 +299,7 @@ public class MovieDatabase extends Application {
         profile.setFitWidth(16);
         profile.setLayoutX(614);
         profile.setLayoutY(32);
-        Image image3 = new Image(getClass().getResourceAsStream("profile.png"));
+        Image image3 = new Image(getClass().getResourceAsStream("src/main/resources/profile.png"));
         profile.setImage(image3);
 
         ImageView logout = new ImageView();
@@ -307,7 +307,7 @@ public class MovieDatabase extends Application {
         logout.setFitWidth(20);
         logout.setLayoutX(612);
         logout.setLayoutY(55);
-        Image image4 = new Image(getClass().getResourceAsStream("logout.png"));
+        Image image4 = new Image(getClass().getResourceAsStream("src/main/resources/logout.png"));
         logout.setImage(image4);
 
         // Vytvoření tabulky filmů
@@ -510,11 +510,15 @@ public class MovieDatabase extends Application {
     // validace proti XSD souboru
     private void validateMovieAgainstXsd(Movie movie) throws SAXException, IOException, URISyntaxException {
         // Vytovreni schema factory co vytvori schema z XSD souboru
-        SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        Schema schema = factory.newSchema(new StreamSource(Objects.requireNonNull(getClass().getResource("src/main/resources/movies.xsd")).getFile()));
-        Validator validator = schema.newValidator();
+        Path xsdPath = Paths.get(Objects.requireNonNull(getClass().getResource("src/main/resources/movies.xsd")).toURI());
+        if (Files.exists(xsdPath)) {
+            SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            Schema schema = factory.newSchema(new StreamSource(xsdPath.toFile()));
+            Validator validator = schema.newValidator();
+            // rest of the validation code
 
-        // vytvoreni xmlmapper pro prevedeni Movie na XML string (bez pretvoreni na string to nejde)
+
+            // vytvoreni xmlmapper pro prevedeni Movie na XML string (bez pretvoreni na string to nejde)
         XmlMapper xmlMapper = new XmlMapper();
         String xml = xmlMapper.writeValueAsString(movie);
 
@@ -528,6 +532,7 @@ public class MovieDatabase extends Application {
 
         // zapsani noveho filmu do XML
         xmlMapper.writeValue(MOVIES_FILE, existingMovies);
+    }
     }
 
     private void validateReviewAgainstXsd(Review review) throws SAXException, IOException, URISyntaxException {
