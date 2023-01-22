@@ -184,7 +184,7 @@ public class MovieDatabase extends Application {
 // Label Moje filmy
         Button mojeFilmy = new Button();
         mojeFilmy.setAlignment(Pos.CENTER);
-        mojeFilmy.setLayoutX(495);
+        mojeFilmy.setLayoutX(490);
         mojeFilmy.setLayoutY(50);
         mojeFilmy.setPrefHeight(30);
         mojeFilmy.setText("Moje filmy");
@@ -359,6 +359,8 @@ public class MovieDatabase extends Application {
         ratingColumn.setCellValueFactory(new PropertyValueFactory<>("hodnoceni"));
 
         movieTable.getColumns().addAll(titleColumn, yearColumn, directorColumn, ratingColumn);
+        movieTable.setLayoutX(20);
+        movieTable.setLayoutY(110);
 
         // Nastavení položek v tabulce na seznam filmů
         movieTable.setItems(FXCollections.observableArrayList(movies));
@@ -380,6 +382,26 @@ public class MovieDatabase extends Application {
             movieTable.setItems(FXCollections.observableArrayList(filteredMovies));
 
 
+        });
+//        prechod mezi hlavnim menu a moje filmy
+        mojeFilmy.setOnAction(event -> {
+            if (hlavniStrana.getTextFill().equals((Color.web("#ba0305"))))
+            {
+                        mojeFilmy.setTextFill(Color.web("#ba0305"));
+                        mojeFilmyLine.setStroke(Color.web("#ba0305"));
+                        hlavniStrana.setTextFill(Color.BLACK);
+                        hlavniLine.setStroke(Color.BLACK);
+                    }
+        });
+
+        hlavniStrana.setOnAction(event -> {
+            if (mojeFilmy.getTextFill().equals((Color.web("#ba0305"))))
+            {
+                hlavniStrana.setTextFill(Color.web("#ba0305"));
+                hlavniLine.setStroke(Color.web("#ba0305"));
+                mojeFilmy.setTextFill(Color.BLACK);
+                mojeFilmyLine .setStroke(Color.BLACK);
+            }
         });
 
 
@@ -443,7 +465,7 @@ public class MovieDatabase extends Application {
 
         // Nastavení scény a zobrazení filmové databáze
         root.getChildren().add(anchorPane);
-        anchorPane.getChildren().addAll(mojeFilmy, hlavniLine, mojeFilmyLine, hlavniStrana, topBarRect, searchField, imageViewoptions, xBoxFilmu, searchIcon,  horniMenu, optionsButton, addMovieForm);
+        anchorPane.getChildren().addAll(mojeFilmy, hlavniLine, mojeFilmyLine, hlavniStrana, topBarRect, searchField, imageViewoptions, xBoxFilmu, searchIcon,  horniMenu, optionsButton, addMovieForm, movieTable);
         stage.setScene(new Scene(root));
         stage.show();
 
