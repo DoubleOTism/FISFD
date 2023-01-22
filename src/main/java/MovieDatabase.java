@@ -301,17 +301,18 @@ public class MovieDatabase extends Application {
         ImageView searchIcon = new ImageView();
         searchIcon.setFitHeight(14);
         searchIcon.setFitWidth(14);
-        searchIcon.setLayoutX(113);
+        searchIcon.setLayoutX(80);
         searchIcon.setLayoutY(15);
         Image image2 = new Image(getClass().getResourceAsStream("src/main/resources/searchIcon.png"));
         searchIcon.setImage(image2);
+
 
         ImageView profile = new ImageView();
         profile.setFitHeight(16);
         profile.setFitWidth(16);
         profile.setLayoutX(614);
         profile.setLayoutY(32);
-        Image image3 = new Image(getClass().getResourceAsStream("src/main/resources/profile.png"));
+        Image image3 = new Image(getClass().getResourceAsStream("src/main/resources/profileWhite.png"));
         profile.setImage(image3);
 
 
@@ -389,9 +390,8 @@ public class MovieDatabase extends Application {
         MovieTable.setItems(FXCollections.observableArrayList(movies));
 
         // Vytvoření vyhledávacího panelu
-        TextField searchBar = new TextField();
-        searchBar.setPromptText("Hledej");
-        searchBar.textProperty().addListener((observable, oldValue, newValue) -> {
+        searchField.setPromptText("Hledej");
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
             // Filtrování filmů na základě vyhledávacího dotazu
             List<Movie> filteredMovies = movies.stream()
                     .filter(movie -> movie.getTitle().contains(newValue) ||
@@ -484,7 +484,7 @@ public class MovieDatabase extends Application {
         });
         HBox addMovieForm = new HBox(addMovieButton, deleteButton);
         addMovieForm.setSpacing(10);
-        VBox container = new VBox(MovieTable, searchBar, addMovieForm);
+        VBox container = new VBox(MovieTable, addMovieForm);
         addMovieForm.setLayoutX(20);
         addMovieForm.setLayoutY(595);
         container.setSpacing(10);
@@ -994,6 +994,16 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
 
         // Přidání všech elementů na user stage
         leftPanelUser.setPadding(new Insets(10));
+
+
+        labelUserPanel.setPadding(new Insets(20, 0, 300, 0));
+        changePasswordButton.setPadding(new Insets(10));
+        goToMainStage.setPadding(new Insets(10));
+        changePicture.setPadding(new Insets(10));
+        leftPanelUser.setSpacing(10);
+
+
+
         leftPanelUser.getChildren().setAll(usersImage, labelUserPanel, changePasswordButton, goToMainStage, changePicture);
         borderPaneUserPanel.setLeft(leftPanelUser);
         borderPaneUserPanel.setCenter(usersReviews);
