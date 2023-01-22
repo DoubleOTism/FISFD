@@ -19,7 +19,6 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeType;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
@@ -68,7 +67,8 @@ public class MovieDatabase extends Application {
 
     private Movie currentMovie;
     private Movie vybranejFilm;
-    TableView<Movie> movieTable = new TableView<>();
+    TableView<Movie> MovieTable = new TableView<>();
+    TableView<Movie> myMovieTable = new TableView<>();
 
 
     private String currentMovieString;
@@ -342,6 +342,27 @@ public class MovieDatabase extends Application {
 
 
 
+        // Vytvoření tabulky moje filmy
+
+        TableColumn<Movie, String> myTitleColumn = new TableColumn<>("Název");
+        myTitleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
+
+        TableColumn<Movie, Integer> myYearColumn = new TableColumn<>("Rok");
+        myYearColumn.setCellValueFactory(new PropertyValueFactory<>("year"));
+
+        TableColumn<Movie, String> myDirectorColumn = new TableColumn<>("Režisér");
+        myDirectorColumn.setCellValueFactory(new PropertyValueFactory<>("director"));
+
+        TableColumn<Movie, Integer> myRatingColumn = new TableColumn<>("Naše hodnocení");
+        myRatingColumn.setCellValueFactory(new PropertyValueFactory<>("hodnoceni"));
+
+        myMovieTable.getColumns().addAll(myRatingColumn, myDirectorColumn, myTitleColumn, myYearColumn);
+        myMovieTable.setLayoutX(20);
+        myMovieTable.setLayoutY(110);
+        myMovieTable.setPrefHeight(480);
+        myMovieTable.setPrefWidth(760);
+        myMovieTable.setVisible(false);
+
 
 
         // Vytvoření tabulky filmů
@@ -358,12 +379,14 @@ public class MovieDatabase extends Application {
         TableColumn<Movie, Integer> ratingColumn = new TableColumn<>("Naše hodnocení");
         ratingColumn.setCellValueFactory(new PropertyValueFactory<>("hodnoceni"));
 
-        movieTable.getColumns().addAll(titleColumn, yearColumn, directorColumn, ratingColumn);
-        movieTable.setLayoutX(20);
-        movieTable.setLayoutY(110);
+        MovieTable.getColumns().addAll(titleColumn, yearColumn, directorColumn, ratingColumn);
+        MovieTable.setLayoutX(20);
+        MovieTable.setLayoutY(110);
+        MovieTable.setPrefHeight(480);
+        MovieTable.setPrefWidth(760);
 
         // Nastavení položek v tabulce na seznam filmů
-        movieTable.setItems(FXCollections.observableArrayList(movies));
+        MovieTable.setItems(FXCollections.observableArrayList(movies));
 
         // Vytvoření vyhledávacího panelu
         TextField searchBar = new TextField();
@@ -379,7 +402,7 @@ public class MovieDatabase extends Application {
                     .collect(Collectors.toList());
 
             // Nastavení položek v tabulce na filtrovaný seznam filmů
-            movieTable.setItems(FXCollections.observableArrayList(filteredMovies));
+            MovieTable.setItems(FXCollections.observableArrayList(filteredMovies));
 
 
         });
@@ -391,6 +414,8 @@ public class MovieDatabase extends Application {
                         mojeFilmyLine.setStroke(Color.web("#ba0305"));
                         hlavniStrana.setTextFill(Color.BLACK);
                         hlavniLine.setStroke(Color.BLACK);
+                        MovieTable.setVisible(false);
+                        myMovieTable.setVisible(true);
                     }
         });
 
@@ -401,6 +426,8 @@ public class MovieDatabase extends Application {
                 hlavniLine.setStroke(Color.web("#ba0305"));
                 mojeFilmy.setTextFill(Color.BLACK);
                 mojeFilmyLine .setStroke(Color.BLACK);
+                MovieTable.setVisible(true);
+                myMovieTable.setVisible(false);
             }
         });
 
@@ -415,9 +442,9 @@ public class MovieDatabase extends Application {
         });
 
         //Přidání prokliknutí na daný film
-        movieTable.setOnMouseClicked(event -> {
+        MovieTable.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) {
-                Movie selectedMovie = movieTable.getSelectionModel().getSelectedItem();
+                Movie selectedMovie = MovieTable.getSelectionModel().getSelectedItem();
                 String title = selectedMovie.getTitle();
                 currentMovie = selectedMovie;
                 currentMovieString = title;
@@ -433,7 +460,7 @@ public class MovieDatabase extends Application {
         // Tlačítko pro odebrání filmu
         Button deleteButton = new Button("Odstranit");
         deleteButton.setOnAction(event -> {
-            vybranejFilm = movieTable.getSelectionModel().getSelectedItem();
+            vybranejFilm = MovieTable.getSelectionModel().getSelectedItem();
 
             if (vybranejFilm != null) {
 
@@ -457,15 +484,15 @@ public class MovieDatabase extends Application {
         });
         HBox addMovieForm = new HBox(addMovieButton, deleteButton);
         addMovieForm.setSpacing(10);
-        VBox container = new VBox(movieTable, searchBar, addMovieForm);
+        VBox container = new VBox(MovieTable, searchBar, addMovieForm);
         addMovieForm.setLayoutX(20);
-        addMovieForm.setLayoutY(580);
+        addMovieForm.setLayoutY(595);
         container.setSpacing(10);
         container.setPadding(new Insets(10));
 
         // Nastavení scény a zobrazení filmové databáze
         root.getChildren().add(anchorPane);
-        anchorPane.getChildren().addAll(mojeFilmy, hlavniLine, mojeFilmyLine, hlavniStrana, topBarRect, searchField, imageViewoptions, xBoxFilmu, searchIcon,  horniMenu, optionsButton, addMovieForm, movieTable);
+        anchorPane.getChildren().addAll(mojeFilmy, hlavniLine, mojeFilmyLine, hlavniStrana, topBarRect, searchField, imageViewoptions, xBoxFilmu, searchIcon,  horniMenu, optionsButton, addMovieForm, MovieTable, myMovieTable);
         stage.setScene(new Scene(root));
         stage.show();
 
@@ -488,7 +515,7 @@ public class MovieDatabase extends Application {
                 movies.remove(vybranejFilm);
                 deleteMovies();
                 loadMovies();
-                movieTable.setItems(FXCollections.observableArrayList(movies));
+                MovieTable.setItems(FXCollections.observableArrayList(movies));
             }
         });
     }
