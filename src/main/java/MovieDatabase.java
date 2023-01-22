@@ -811,6 +811,79 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
     // Uživatelský panel, sloužící pro nastavení účtu.
     private void showUserPanelStage (Stage stage) throws IOException {
 
+        Rectangle topBarUser = new Rectangle();
+        topBarUser.setArcHeight(5);
+        topBarUser.setArcWidth(5);
+        topBarUser.setFill(Color.web("#ba0305"));
+        topBarUser.setHeight(38);
+        topBarUser.setLayoutX(3);
+        topBarUser.setLayoutY(6);
+        topBarUser.setStroke(Color.web("#837272"));
+        topBarUser.setStrokeType(StrokeType.INSIDE);
+        topBarUser.setWidth(634);
+
+        Text nameUser = new Text();
+        nameUser.setLayoutX(28);
+        nameUser.setLayoutY(205);
+        nameUser.setStrokeType(StrokeType.OUTSIDE);
+        nameUser.setText("jmeno a prijmeni");
+        nameUser.setTextAlignment(TextAlignment.CENTER);
+        nameUser.setWrappingWidth(138.63671875);
+        nameUser.setFont(new Font(14));
+
+        Rectangle reviewBody = new Rectangle();
+        reviewBody.setArcHeight(10);
+        reviewBody.setArcWidth(10);
+        reviewBody.setFill(Color.web("#d3d3d3"));
+        reviewBody.setHeight(330);
+        reviewBody.setLayoutX(208);
+        reviewBody.setLayoutY(52);
+        reviewBody.setStroke(Color.BLACK);
+        reviewBody.setStrokeType(StrokeType.INSIDE);
+        reviewBody.setWidth(410);
+
+        Rectangle reviewHead = new Rectangle();
+        reviewHead.setArcHeight(10);
+        reviewHead.setArcWidth(10);
+        reviewHead.setFill(Color.web("#949494"));
+        reviewHead.setHeight(34);
+        reviewHead.setLayoutX(208);
+        reviewHead.setLayoutY(52);
+        reviewHead.setStroke(Color.BLACK);
+        reviewHead.setStrokeType(StrokeType.INSIDE);
+        reviewHead.setWidth(410);
+
+        Text mojeRecenze = new Text();
+        mojeRecenze.setFill(Color.WHITE);
+        mojeRecenze.setLayoutX(231);
+        mojeRecenze.setLayoutY(74);
+        mojeRecenze.setStrokeType(StrokeType.OUTSIDE);
+        mojeRecenze.setText("Moje recenze");
+        mojeRecenze.setFont(new Font(16));
+
+        Text textRecenze = new Text();
+        textRecenze.setLayoutX(267);
+        textRecenze.setLayoutY(129);
+        textRecenze.setStrokeType(StrokeType.OUTSIDE);
+        textRecenze.setText("text recenze");
+
+        TextField userSearchBar = new TextField();
+        userSearchBar.setLayoutX(115);
+        userSearchBar.setLayoutY(11);
+        userSearchBar.setPrefHeight(25);
+        userSearchBar.setPrefWidth(144);
+
+        ImageView profileImage = new ImageView();
+        profileImage.setFitHeight(112);
+        profileImage.setFitWidth(114);
+        profileImage.setLayoutX(40);
+        profileImage.setLayoutY(60);
+        profileImage.setImage(new Image(getClass().getResource("/profile.png").toExternalForm()));
+
+
+
+
+
         // Zavedeni okna, uvitani uzivatele, vykresleni prvku
         BorderPane borderPaneUserPanel = new BorderPane();
         Scene userScene = new Scene(borderPaneUserPanel);
