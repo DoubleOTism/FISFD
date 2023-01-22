@@ -3,6 +3,7 @@ import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
@@ -240,14 +241,16 @@ public class MovieDatabase extends Application {
         searchField.setPrefHeight(25);
         searchField.setPrefWidth(144);
 
-        ImageView imageView = new ImageView();
-        imageView.setFitHeight(16);
-        imageView.setFitWidth(16);
-        imageView.setLayoutX(614);
-        imageView.setLayoutY(14);
+        ImageView imageViewoptions = new ImageView();
+        imageViewoptions.setFitHeight(16);
+        imageViewoptions.setFitWidth(16);
+        imageViewoptions.setLayoutX(614);
+        imageViewoptions.setLayoutY(14);
 
-        Image profileIcon = new Image(getClass().getResourceAsStream("src/main/resources/profile.png"));
-        imageView.setImage(profileIcon);
+
+        Image optionsIcon = new Image(getClass().getResourceAsStream("src/main/resources/options.png"));
+        imageViewoptions.setImage(optionsIcon);
+// side menu nahore vpravo, defaultne je neviditelne, po kliknuti ikonky profile zobrazit
 
         Rectangle sideMenu = new Rectangle();
         sideMenu.setArcHeight(5);
@@ -266,17 +269,26 @@ public class MovieDatabase extends Application {
         mujProfil.setText("Můj profil");
         mujProfil.setTextFill(Color.WHITE);
 
+
         Label odhlasit = new Label();
         odhlasit.setLayoutX(528);
         odhlasit.setLayoutY(57);
         odhlasit.setText("Odhlásit");
         odhlasit.setTextFill(Color.WHITE);
 
-        HBox hbox = new HBox();
-        hbox.setLayoutX(67);
-        hbox.setLayoutY(96);
-        hbox.setPrefHeight(100);
-        hbox.setPrefWidth(502);
+        HBox xBoxFilmu = new HBox();
+        xBoxFilmu.setLayoutX(67);
+        xBoxFilmu.setLayoutY(96);
+        xBoxFilmu.setPrefHeight(100);
+        xBoxFilmu.setPrefWidth(502);
+
+        Button optionsButton = new Button();
+        optionsButton.setLayoutX(605);
+        optionsButton.setLayoutY(5);
+        optionsButton.setGraphic(imageViewoptions);
+        optionsButton.setBackground(new Background(new BackgroundFill(Color.web("#ba0305"), null, null)));
+
+
 
         ImageView xButton = new ImageView();
         xButton.setFitHeight(21);
@@ -302,6 +314,7 @@ public class MovieDatabase extends Application {
         Image image3 = new Image(getClass().getResourceAsStream("src/main/resources/profile.png"));
         profile.setImage(image3);
 
+
         ImageView logout = new ImageView();
         logout.setFitHeight(20);
         logout.setFitWidth(20);
@@ -309,6 +322,20 @@ public class MovieDatabase extends Application {
         logout.setLayoutY(55);
         Image image4 = new Image(getClass().getResourceAsStream("src/main/resources/logout.png"));
         logout.setImage(image4);
+
+        Button profileButton = new Button();
+        profileButton.setLayoutX(605);
+        profileButton.setLayoutY(5);
+        profileButton.setGraphic(profile);
+        profileButton.setBackground(new Background(new BackgroundFill(Color.web("#ba0305"), null, null)));
+
+        Group horniMenu = new Group();
+        horniMenu.getChildren().addAll(sideMenu, mujProfil, odhlasit, xButton, profile, logout);
+        horniMenu.setVisible(false);
+
+
+
+
 
         // Vytvoření tabulky filmů
 
@@ -407,9 +434,17 @@ public class MovieDatabase extends Application {
         container.setPadding(new Insets(10));
 
         // Nastavení scény a zobrazení filmové databáze
-        stage.setScene(new Scene(container));
+        root.getChildren().add(anchorPane);
+        anchorPane.getChildren().addAll(mojeFilmy, mojeFilmyLine, hlavniStranaLine, hlavniStrana, topBarRect, searchField, imageViewoptions, xBoxFilmu, searchIcon,  horniMenu, profileButton);
+        stage.setScene(new Scene(root));
         stage.show();
 
+
+
+        // Nastavení scény a zobrazení filmové databáze
+        profileButton.setOnMouseClicked(event -> {
+            horniMenu.setVisible(!horniMenu.isVisible());
+        });
 
     }
     /*confirmation box pro overeni odstraneni filmu po ok se vybrany film odstrani z movies a nasledne se zavola metoda deleteMovies() ktera zmenu zapise do XML souboru
