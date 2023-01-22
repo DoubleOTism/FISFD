@@ -515,7 +515,6 @@ public class MovieDatabase extends Application {
             SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             Schema schema = factory.newSchema(new StreamSource(xsdPath.toFile()));
             Validator validator = schema.newValidator();
-            // rest of the validation code
 
 
             // vytvoreni xmlmapper pro prevedeni Movie na XML string (bez pretvoreni na string to nejde)
@@ -537,9 +536,11 @@ public class MovieDatabase extends Application {
 
     private void validateReviewAgainstXsd(Review review) throws SAXException, IOException, URISyntaxException {
         // Vytovreni schema factory co vytvori schema z XSD souboru
-        SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        Schema schema = factory.newSchema(new StreamSource(Objects.requireNonNull(getClass().getResource("src/main/resources/review.xsd")).getFile()));
-        Validator validator = schema.newValidator();
+        Path xsdPath = Paths.get(Objects.requireNonNull(getClass().getResource("src/main/resources/review.xsd")).toURI());
+        if (Files.exists(xsdPath)) {
+            SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            Schema schema = factory.newSchema(new StreamSource(xsdPath.toFile()));
+            Validator validator = schema.newValidator();
 
         // vytvoreni xmlmapper pro prevedeni Movie na XML string (bez pretvoreni na string to nejde)
         XmlMapper xmlMapper = new XmlMapper();
@@ -555,6 +556,7 @@ public class MovieDatabase extends Application {
 
         // zapsani noveho filmu do XML
         xmlMapper.writeValue(REVIEW_FILE, existingReviews);
+    }
     }
 
 
