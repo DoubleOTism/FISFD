@@ -7,10 +7,12 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="fisfdProto" />
+        <module name="movie-db" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="fisfdProto" target="1.8" />
+      <module name="movie-db" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>
