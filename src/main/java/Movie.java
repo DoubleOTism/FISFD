@@ -17,7 +17,9 @@ public class Movie {
     @JacksonXmlProperty(localName = "rating")
     @JsonProperty(required = false)
     private float hodnoceni;
-
+    @JacksonXmlProperty(localName = "info")
+    @JsonProperty(required = false)
+    private String info;
 
     // NEMAZAT!!
     public Movie() {
@@ -25,11 +27,12 @@ public class Movie {
 
     }
 
-    public Movie(String title, int year, String director, float hodnoceni) {
+    public Movie(String title, int year, String director, float hodnoceni, String info) {
         this.title = title;
         this.year = year;
         this.director = director;
         this.hodnoceni = hodnoceni;
+        this.info = info;
     }
 
 
@@ -60,5 +63,8 @@ public class Movie {
         this.director = director;
 
     }
+
+    public String getInfo() {return info;}
+    public void setInfo() {this.info = info;}
 
 }
