@@ -11,13 +11,15 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.StrokeType;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -164,6 +166,150 @@ public class MovieDatabase extends Application {
 
 
     private void showMovieDatabase(Stage stage) {
+
+
+        // hlavni okno
+        VBox root = new VBox();
+        root.setPrefHeight(400);
+        root.setPrefWidth(640);
+
+// Anchor pane
+        AnchorPane anchorPane = new AnchorPane();
+        anchorPane.setMaxHeight(-1);
+        anchorPane.setMaxWidth(-1);
+        anchorPane.setPrefHeight(-1);
+        anchorPane.setPrefWidth(-1);
+
+// Label Moje filmy
+        Label mojeFilmy = new Label();
+        mojeFilmy.setAlignment(Pos.CENTER);
+        mojeFilmy.setLayoutX(369);
+        mojeFilmy.setLayoutY(40);
+        mojeFilmy.setPrefHeight(30);
+        mojeFilmy.setPrefWidth(101);
+        mojeFilmy.setText("Moje filmy");
+        mojeFilmy.setTextAlignment(TextAlignment.CENTER);
+        mojeFilmy.setWrapText(false);
+        mojeFilmy.setFont(new Font(20));
+        mojeFilmy.setTextFill(Color.web("#ba0305"));
+
+// moje filmy line
+        Line mojeFilmyLine = new Line();
+        mojeFilmyLine.setEndX(65);
+        mojeFilmyLine.setLayoutX(229);
+        mojeFilmyLine.setLayoutY(71);
+        mojeFilmyLine.setStartX(-76);
+        mojeFilmyLine.setStroke(Color.web("#ba0305"));
+
+// hlavni strana line
+        Line hlavniStranaLine = new Line();
+        hlavniStranaLine.setEndX(70);
+        hlavniStranaLine.setLayoutX(408);
+        hlavniStranaLine.setLayoutY(70);
+        hlavniStranaLine.setStartX(-45);
+
+// hlavni strana label
+        Label hlavniStrana = new Label();
+        hlavniStrana.setAlignment(Pos.CENTER);
+        hlavniStrana.setLayoutX(164);
+        hlavniStrana.setLayoutY(41);
+        hlavniStrana.setPrefHeight(30);
+        hlavniStrana.setPrefWidth(123);
+        hlavniStrana.setText("Hlavní strana");
+        hlavniStrana.setTextAlignment(TextAlignment.CENTER);
+        hlavniStrana.setWrapText(false);
+        hlavniStrana.setFont(new Font(20));
+
+// top bar rectangle
+        Rectangle topBarRect = new Rectangle();
+        topBarRect.setArcHeight(5);
+        topBarRect.setArcWidth(5);
+        topBarRect.setFill(Color.web("#ba0305"));
+        topBarRect.setHeight(38);
+        topBarRect.setLayoutX(3);
+        topBarRect.setLayoutY(3);
+        topBarRect.setStroke(Color.web("#837272"));
+        topBarRect.setStrokeType(StrokeType.INSIDE);
+        topBarRect.setStrokeWidth(0);
+        topBarRect.setWidth(634);
+//search Field
+
+        TextField searchField = new TextField();
+        searchField.setLayoutX(104);
+        searchField.setLayoutY(9);
+        searchField.setPrefHeight(25);
+        searchField.setPrefWidth(144);
+
+        ImageView imageView = new ImageView();
+        imageView.setFitHeight(16);
+        imageView.setFitWidth(16);
+        imageView.setLayoutX(614);
+        imageView.setLayoutY(14);
+
+        Image profileIcon = new Image(getClass().getResourceAsStream("src/main/resources/profile.png"));
+        imageView.setImage(profileIcon);
+
+        Rectangle sideMenu = new Rectangle();
+        sideMenu.setArcHeight(5);
+        sideMenu.setArcWidth(5);
+        sideMenu.setFill(Color.web("#ba0305"));
+        sideMenu.setHeight(76);
+        sideMenu.setLayoutX(516);
+        sideMenu.setLayoutY(6);
+        sideMenu.setStroke(Color.BLACK);
+        sideMenu.setStrokeType(StrokeType.INSIDE);
+        sideMenu.setWidth(119);
+
+        Label mujProfil = new Label();
+        mujProfil.setLayoutX(528);
+        mujProfil.setLayoutY(32);
+        mujProfil.setText("Můj profil");
+        mujProfil.setTextFill(Color.WHITE);
+
+        Label odhlasit = new Label();
+        odhlasit.setLayoutX(528);
+        odhlasit.setLayoutY(57);
+        odhlasit.setText("Odhlásit");
+        odhlasit.setTextFill(Color.WHITE);
+
+        HBox hbox = new HBox();
+        hbox.setLayoutX(67);
+        hbox.setLayoutY(96);
+        hbox.setPrefHeight(100);
+        hbox.setPrefWidth(502);
+
+        ImageView xButton = new ImageView();
+        xButton.setFitHeight(21);
+        xButton.setFitWidth(21);
+        xButton.setLayoutX(611);
+        xButton.setLayoutY(8);
+        Image image1 = new Image(getClass().getResourceAsStream("xButton.png"));
+        xButton.setImage(image1);
+
+        ImageView searchIcon = new ImageView();
+        searchIcon.setFitHeight(14);
+        searchIcon.setFitWidth(14);
+        searchIcon.setLayoutX(113);
+        searchIcon.setLayoutY(15);
+        Image image2 = new Image(getClass().getResourceAsStream("searchIcon.png"));
+        searchIcon.setImage(image2);
+
+        ImageView profile = new ImageView();
+        profile.setFitHeight(16);
+        profile.setFitWidth(16);
+        profile.setLayoutX(614);
+        profile.setLayoutY(32);
+        Image image3 = new Image(getClass().getResourceAsStream("profile.png"));
+        profile.setImage(image3);
+
+        ImageView logout = new ImageView();
+        logout.setFitHeight(20);
+        logout.setFitWidth(20);
+        logout.setLayoutX(612);
+        logout.setLayoutY(55);
+        Image image4 = new Image(getClass().getResourceAsStream("logout.png"));
+        logout.setImage(image4);
+
         // Vytvoření tabulky filmů
 
         TableColumn<Movie, String> titleColumn = new TableColumn<>("Název");
