@@ -253,8 +253,7 @@ public class MovieDatabase extends Application {
         addMovieButton.setOnAction(event -> {
             addMovieToDatabase(stage);
         });
-        HBox addMovieForm = new HBox(addMovieButton, deleteButton);
-        addMovieForm.setSpacing(10);
+
 
 
         // Vytvoření tlačítka pro odhlášení
@@ -265,8 +264,9 @@ public class MovieDatabase extends Application {
 
             start(stage);
         });
-
-        VBox container = new VBox(movieTable, searchBar, addMovieForm, logoutButton, userPanelButton);
+        HBox addMovieForm = new HBox(addMovieButton, deleteButton, logoutButton, userPanelButton);
+        addMovieForm.setSpacing(10);
+        VBox container = new VBox(movieTable, searchBar, addMovieForm);
         container.setSpacing(10);
         container.setPadding(new Insets(10));
 
@@ -301,31 +301,45 @@ public class MovieDatabase extends Application {
         TextArea infoInput = new TextArea();
         infoInput.setPromptText("Info o filmu, jeho obsah");
 
-        TextField hodnoceniInput = new TextField();
-        hodnoceniInput.setPromptText("Hodnoceni");
+        Label hodnoceniFilmu = new Label("Bodové hodnocení filmu: ");
+
+        Slider hodnoceniSlider = new Slider(0.0,5.0,0);
+        hodnoceniSlider.setBlockIncrement(0.5);
+        hodnoceniSlider.setShowTickLabels(true);
+        hodnoceniSlider.setSnapToTicks(true);
+        hodnoceniSlider.setMajorTickUnit(0.5);
+        hodnoceniSlider.setMinorTickCount(0);
+        hodnoceniSlider.setShowTickMarks(true);
 
         Button addButton = new Button("Add Movie");
         addButton.setOnAction(event -> {
+            Double doubleToFloat = hodnoceniSlider.getValue();
+            Float convertedDouble = doubleToFloat.floatValue();
             // Vytvoření nového filmu se vstupními hodnotami
-
-            Movie movie = new Movie(titleInput.getText(), Integer.parseInt(yearInput.getText()), directorInput.getText(), Float.parseFloat(hodnoceniInput.getText()), infoInput.getText());
-
             try {
-                validateMovieAgainstXsd(movie);
-                // Přidání filmu do seznamu filmů
-                movies.add(movie);
-                // Vymazání vstupních polí
-                titleInput.clear();
-                yearInput.clear();
-                directorInput.clear();
-                hodnoceniInput.clear();
-                addMovie.close();
-                showMovieDatabase(stage);
-            } catch (SAXException | IOException | URISyntaxException e) {
-                // Zobrazte chybové hlášení
-                Alert alert = new Alert(Alert.AlertType.ERROR, "Film se nepodařilo přidat do databáze: " + e.getMessage());
+                Movie movie = new Movie(titleInput.getText(), Integer.parseInt(yearInput.getText()), directorInput.getText(), convertedDouble, infoInput.getText());
+                try {
+                    validateMovieAgainstXsd(movie);
+                    // Přidání filmu do seznamu filmů
+                    movies.add(movie);
+                    // Vymazání vstupních polí
+                    titleInput.clear();
+                    yearInput.clear();
+                    directorInput.clear();
+                    addMovie.close();
+                    showMovieDatabase(stage);
+                    System.gc();
+                } catch (SAXException | IOException | URISyntaxException | NumberFormatException e) {
+                    // Zobrazte chybové hlášení
+                    Alert alert = new Alert(Alert.AlertType.ERROR, "Film se nepodařilo přidat do databáze: " + e.getMessage());
+                    alert.show();
+                }
+            } catch (NumberFormatException e) {
+                Alert alert = new Alert(Alert.AlertType.ERROR, "Některá z kolonek není vyplněná, zkus to znovu: " + e.getMessage());
                 alert.show();
             }
+
+
         });
         Button goBackButton = new Button("Zrušit");
         goBackButton.setOnAction(event -> {
@@ -333,13 +347,14 @@ public class MovieDatabase extends Application {
             showMovieDatabase(stage);
             System.gc();
         });
-        vBox.getChildren().addAll(addFilmLabel, titleInput, yearInput,directorInput, infoInput, hodnoceniInput);
+        vBox.getChildren().addAll(addFilmLabel, titleInput, yearInput,directorInput, infoInput, hodnoceniFilmu, hodnoceniSlider);
         vBox.setAlignment(Pos.CENTER);
         vBox.setPadding(new Insets(10));
         hBox.getChildren().addAll(addButton, goBackButton);
         borderPaneAddMovie.setCenter(vBox);
         borderPaneAddMovie.setBottom(hBox);
         addMovie.setScene(addMovieScene);
+        addMovie.initModality(Modality.APPLICATION_MODAL);
         addMovie.show();
     }
 
@@ -636,6 +651,7 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
         borderPaneAddReview.setCenter(reviewVBox);
         borderPaneAddReview.setBottom(reviewHBox);
         reviewStage.setScene(movieScene);
+        reviewStage.initModality(Modality.APPLICATION_MODAL);
         reviewStage.show();
     }
 
