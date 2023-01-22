@@ -64,6 +64,10 @@ public class MovieDatabase extends Application {
 
 
     private Movie currentMovie;
+    private Movie vybranejFilm;
+    TableView<Movie> movieTable = new TableView<>();
+
+
     private String currentMovieString;
 
     public MovieDatabase() throws URISyntaxException {
@@ -161,7 +165,6 @@ public class MovieDatabase extends Application {
 
     private void showMovieDatabase(Stage stage) {
         // Vytvoření tabulky filmů
-        TableView<Movie> movieTable = new TableView<>();
 
         TableColumn<Movie, String> titleColumn = new TableColumn<>("Název");
         titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
@@ -229,24 +232,11 @@ public class MovieDatabase extends Application {
         // Tlačítko pro odebrání filmu
         Button deleteButton = new Button("Odstranit");
         deleteButton.setOnAction(event -> {
-            Movie vybranejFilm = movieTable.getSelectionModel().getSelectedItem();
+            vybranejFilm = movieTable.getSelectionModel().getSelectedItem();
 
             if (vybranejFilm != null) {
-                /*confirmation box pro overeni odstraneni filmu po ok se vybrany film odstrani z movies a nasledne se zavola metoda deleteMovies() ktera zmenu zapise do XML souboru
-                a nasledne metoda loadMovies() ktera nacte zmenu ,
-                nasledne se updatne movieTable (table se vseme filmama) aby odpovidal aktualnimu stavu XML.
-                (todo: hodit to do jedny metody;)
-                 */
-                Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Jste si jisti, že chcete tento film odstranit?");
-                alert.showAndWait().ifPresent(response -> {
-                    if (response == ButtonType.OK) {
-                        System.out.println("Odstranit");
-                        movies.remove(vybranejFilm);
-                        deleteMovies();
-                        loadMovies();
-                        movieTable.setItems(FXCollections.observableArrayList(movies));
-                    }
-                });
+
+                removeMovieFromDatabase();
             }
         });
         Button addMovieButton = new Button("Přidat film do databáze");
@@ -276,7 +266,21 @@ public class MovieDatabase extends Application {
 
 
     }
-
+    /*confirmation box pro overeni odstraneni filmu po ok se vybrany film odstrani z movies a nasledne se zavola metoda deleteMovies() ktera zmenu zapise do XML souboru
+                a nasledne metoda loadMovies() ktera nacte zmenu ,
+                nasledne se updatne movieTable (table se vseme filmama) aby odpovidal aktualnimu stavu XML.
+                 */
+    private void removeMovieFromDatabase() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Jste si jisti, že chcete tento film odstranit?");
+        alert.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                movies.remove(vybranejFilm);
+                deleteMovies();
+                loadMovies();
+                movieTable.setItems(FXCollections.observableArrayList(movies));
+            }
+        });
+    }
     private void addMovieToDatabase(Stage stage) {
         BorderPane borderPaneAddMovie = new BorderPane();
         borderPaneAddMovie.setMinSize(500,400);
@@ -338,8 +342,6 @@ public class MovieDatabase extends Application {
                 Alert alert = new Alert(Alert.AlertType.ERROR, "Některá z kolonek není vyplněná, zkus to znovu: " + e.getMessage());
                 alert.show();
             }
-
-
         });
         Button goBackButton = new Button("Zrušit");
         goBackButton.setOnAction(event -> {
