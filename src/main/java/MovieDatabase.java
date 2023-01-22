@@ -199,51 +199,7 @@ public class MovieDatabase extends Application {
 
         });
 
-        // Vytvoření formuláře pro přidání filmu
-        TextField titleInput = new TextField();
-        titleInput.setPromptText("Název");
 
-        TextField yearInput = new TextField();
-        yearInput.setPromptText("Rok");
-
-        TextField directorInput = new TextField();
-        directorInput.setPromptText("Režisér");
-
-        // Vytvoření ChoiceBox pro volbu, zda má být film ohodnocen
-        ChoiceBox<String> hasRatingChoiceBox = new ChoiceBox<>(FXCollections.observableArrayList("Yes", "No"));
-        hasRatingChoiceBox.getSelectionModel().select(1);
-
-        TextField hodnoceniInput = new TextField();
-        hodnoceniInput.setPromptText("Hodnoceni");
-
-        Button addButton = new Button("Add Movie");
-        addButton.setOnAction(event -> {
-            // Vytvoření nového filmu se vstupními hodnotami
-            // Získání hodnocení filmu
-            String hasRating = hasRatingChoiceBox.getSelectionModel().getSelectedItem();
-            float rating = 0;
-            if (hasRating.equals("Yes")) {
-                rating = Float.parseFloat(hodnoceniInput.getText());
-            }
-            Movie movie = new Movie(titleInput.getText(), Integer.parseInt(yearInput.getText()), directorInput.getText(), Float.parseFloat(hodnoceniInput.getText()), null);
-
-            try {
-                validateMovieAgainstXsd(movie);
-                // Přidání filmu do seznamu filmů
-                movies.add(movie);
-                // Vymazání vstupních polí
-                titleInput.clear();
-                yearInput.clear();
-                directorInput.clear();
-                hodnoceniInput.clear();
-                // Aktualizujte tabulku tak, aby zobrazovala nově přidaný film
-                movieTable.setItems(FXCollections.observableArrayList(movies));
-            } catch (SAXException | IOException | URISyntaxException e) {
-                // Zobrazte chybové hlášení
-                Alert alert = new Alert(Alert.AlertType.ERROR, "Film se nepodařilo přidat do databáze: " + e.getMessage());
-                alert.show();
-            }
-        });
         // Tlacitko pro zobrazeni uzivatelskeho panelu
         Button userPanelButton = new Button("Zobrazit panel uzivatele");
         userPanelButton.setOnAction(event -> {
@@ -293,8 +249,11 @@ public class MovieDatabase extends Application {
                 });
             }
         });
-
-        HBox addMovieForm = new HBox(titleInput, yearInput, directorInput,hasRatingChoiceBox, hodnoceniInput,addButton, deleteButton);
+        Button addMovieButton = new Button("Přidat film do databáze");
+        addMovieButton.setOnAction(event -> {
+            addMovieToDatabase(stage);
+        });
+        HBox addMovieForm = new HBox(addMovieButton, deleteButton);
         addMovieForm.setSpacing(10);
 
 
@@ -318,12 +277,78 @@ public class MovieDatabase extends Application {
 
     }
 
+    private void addMovieToDatabase(Stage stage) {
+        BorderPane borderPaneAddMovie = new BorderPane();
+        borderPaneAddMovie.setMinSize(500,400);
+        borderPaneAddMovie.setPadding(new Insets(10));
+        Scene addMovieScene = new Scene(borderPaneAddMovie);
+        Stage addMovie = new Stage();
+        VBox vBox = new VBox();
+        HBox hBox = new HBox();
+        // Vytvoření formuláře pro přidání filmu
+        Label addFilmLabel = new Label("Přidání filmu do databáze");
+        addFilmLabel.setFont(Font.font("Arial", FontWeight.BOLD, 25));
+
+        TextField titleInput = new TextField();
+        titleInput.setPromptText("Název");
+
+        TextField yearInput = new TextField();
+        yearInput.setPromptText("Rok");
+
+        TextField directorInput = new TextField();
+        directorInput.setPromptText("Režisér");
+
+        TextArea infoInput = new TextArea();
+        infoInput.setPromptText("Info o filmu, jeho obsah");
+
+        TextField hodnoceniInput = new TextField();
+        hodnoceniInput.setPromptText("Hodnoceni");
+
+        Button addButton = new Button("Add Movie");
+        addButton.setOnAction(event -> {
+            // Vytvoření nového filmu se vstupními hodnotami
+
+            Movie movie = new Movie(titleInput.getText(), Integer.parseInt(yearInput.getText()), directorInput.getText(), Float.parseFloat(hodnoceniInput.getText()), infoInput.getText());
+
+            try {
+                validateMovieAgainstXsd(movie);
+                // Přidání filmu do seznamu filmů
+                movies.add(movie);
+                // Vymazání vstupních polí
+                titleInput.clear();
+                yearInput.clear();
+                directorInput.clear();
+                hodnoceniInput.clear();
+                addMovie.close();
+                showMovieDatabase(stage);
+            } catch (SAXException | IOException | URISyntaxException e) {
+                // Zobrazte chybové hlášení
+                Alert alert = new Alert(Alert.AlertType.ERROR, "Film se nepodařilo přidat do databáze: " + e.getMessage());
+                alert.show();
+            }
+        });
+        Button goBackButton = new Button("Zrušit");
+        goBackButton.setOnAction(event -> {
+            addMovie.close();
+            showMovieDatabase(stage);
+            System.gc();
+        });
+        vBox.getChildren().addAll(addFilmLabel, titleInput, yearInput,directorInput, infoInput, hodnoceniInput);
+        vBox.setAlignment(Pos.CENTER);
+        vBox.setPadding(new Insets(10));
+        hBox.getChildren().addAll(addButton, goBackButton);
+        borderPaneAddMovie.setCenter(vBox);
+        borderPaneAddMovie.setBottom(hBox);
+        addMovie.setScene(addMovieScene);
+        addMovie.show();
+    }
+
 
     // validace proti XSD souboru
     private void validateMovieAgainstXsd(Movie movie) throws SAXException, IOException, URISyntaxException {
         // Vytovreni schema factory co vytvori schema z XSD souboru
         SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        Schema schema = factory.newSchema(new StreamSource(Objects.requireNonNull(getClass().getResource("/movies.xsd")).getFile()));
+        Schema schema = factory.newSchema(new StreamSource(Objects.requireNonNull(getClass().getResource("src/main/resources/movies.xsd")).getFile()));
         Validator validator = schema.newValidator();
 
         // vytvoreni xmlmapper pro prevedeni Movie na XML string (bez pretvoreni na string to nejde)
