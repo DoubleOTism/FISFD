@@ -13,9 +13,11 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -59,6 +61,10 @@ public class MovieDatabase extends Application {
     // idea ukazuje ze currentUser neni pouzity ale NEMAZAT
     private User currentUser;
     private boolean pridani;
+
+
+    private Movie currentMovie;
+    private String currentMovieString;
 
     public MovieDatabase() throws URISyntaxException {
     }
@@ -120,7 +126,13 @@ public class MovieDatabase extends Application {
         guestButton.setOnAction(event -> {
             User guest = new User("guest","guest");
             currentUser = guest;
-            showDemoDatabase(stage);
+            DemoDatabase demo = null;
+            try {
+                demo = new DemoDatabase(stage, movies, currentUser);
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
+            demo.show();
 
         });
 
@@ -160,7 +172,7 @@ public class MovieDatabase extends Application {
         TableColumn<Movie, String> directorColumn = new TableColumn<>("Režisér");
         directorColumn.setCellValueFactory(new PropertyValueFactory<>("director"));
 
-        TableColumn<Movie, Integer> ratingColumn = new TableColumn<>("Hodnocení");
+        TableColumn<Movie, Integer> ratingColumn = new TableColumn<>("Naše hodnocení");
         ratingColumn.setCellValueFactory(new PropertyValueFactory<>("hodnoceni"));
 
         movieTable.getColumns().addAll(titleColumn, yearColumn, directorColumn, ratingColumn);
@@ -183,6 +195,8 @@ public class MovieDatabase extends Application {
 
             // Nastavení položek v tabulce na filtrovaný seznam filmů
             movieTable.setItems(FXCollections.observableArrayList(filteredMovies));
+
+
         });
 
         // Vytvoření formuláře pro přidání filmu
@@ -211,7 +225,7 @@ public class MovieDatabase extends Application {
             if (hasRating.equals("Yes")) {
                 rating = Float.parseFloat(hodnoceniInput.getText());
             }
-            Movie movie = new Movie(titleInput.getText(), Integer.parseInt(yearInput.getText()), directorInput.getText(), Float.parseFloat(hodnoceniInput.getText()));
+            Movie movie = new Movie(titleInput.getText(), Integer.parseInt(yearInput.getText()), directorInput.getText(), Float.parseFloat(hodnoceniInput.getText()), null);
 
             try {
                 validateMovieAgainstXsd(movie);
@@ -238,6 +252,22 @@ public class MovieDatabase extends Application {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+        });
+
+        //Přidání prokliknutí na daný film
+        movieTable.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) {
+                Movie selectedMovie = movieTable.getSelectionModel().getSelectedItem();
+                String title = selectedMovie.getTitle();
+                currentMovie = selectedMovie;
+                currentMovieString = title;
+                try {
+                    showMovieDetails(stage);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
         });
 
         // Tlačítko pro odebrání filmu
@@ -331,7 +361,7 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
         }
 
     }
-    private void loadUsers() {
+    public void loadUsers() {
         XmlMapper xmlMapper = new XmlMapper();
         try {
             users = xmlMapper.readValue(USERS_FILE, xmlMapper.getTypeFactory().constructCollectionType(List.class, User.class));
@@ -376,7 +406,7 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
         }
 
     }
-    private void saveUsers() {
+    public void saveUsers() {
         try {
             XmlMapper xmlMapper = new XmlMapper();
             xmlMapper.writeValue(USERS_FILE, users);
@@ -384,6 +414,113 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
             e.printStackTrace();
         }
     }
+    // Slouží pro zobrazení infa o filmu, uživatel dostane image, info filmu, recenze filmu, basic úpdaje o lidech, co to vytvořili.
+    private void showMovieDetails (Stage stage) throws IOException {
+        BorderPane borderPaneMovieDetail = new BorderPane();
+        borderPaneMovieDetail.setMinSize(800,600);
+        borderPaneMovieDetail.setPadding(new Insets(10));
+        Scene movieScene = new Scene(borderPaneMovieDetail);
+        VBox movieDetailsVBox = new VBox();
+        VBox movieDetailLeftBox = new VBox();
+        HBox movieDetailHBox = new HBox();
+        movieDetailsVBox.setMinWidth(800);
+
+        //Load obrazku filmu, pokud neni zadny obrazek definovany uzivatelem, nacte default obrazek.
+        Image imageMovie = null;
+
+        try {
+            imageMovie = new Image(new FileInputStream("src/main/resources/movies/" + currentMovieString + ".png"));
+        } catch (FileNotFoundException e) {
+            imageMovie = new Image(Files.newInputStream(Paths.get("src/main/resources/movies/base.png")));
+        }
+        ImageView movieImage = new ImageView(imageMovie);
+        movieImage.setFitHeight(250);
+        movieImage.setFitWidth(200);
+
+
+
+
+        // Vytvoření TableView pro recenze u každého filmu, tahá to z XML review.xml, dle jména snímku. Používá .filter
+        //  s tím, že si tov ezme název filmu ve stringu a vyfilturje to recenze jen o daném filmu. Retardované, ale
+        //  funkční, i guess.
+        TableView<Review> movieDetailReview = new TableView<>();
+        TableColumn<Review, String> reviewColumn = new TableColumn<>("Recenze");
+        reviewColumn.setCellValueFactory(new PropertyValueFactory<>("textRecenze"));
+        TableColumn<Review, String> userColumn = new TableColumn<>("Uživatel");
+        userColumn.setCellValueFactory(new PropertyValueFactory<>("revUser"));
+        TableColumn<Review, String> ratingColumn = new TableColumn<>("Hodnoceni");
+        ratingColumn.setCellValueFactory(new PropertyValueFactory<>("revHodnoceni"));
+        movieDetailReview.getColumns().setAll(reviewColumn, userColumn, ratingColumn);
+        movieDetailReview.setItems(FXCollections.observableArrayList(reviews));
+        List<Review> filteredReviews = reviews.stream().filter(review -> review.getReviewedMovie().contains(currentMovieString)).collect(Collectors.toList());
+        movieDetailReview.setItems(FXCollections.observableArrayList(filteredReviews));
+
+        //Tlačítko pro změnu obrázku filmu, jedno a to samý co u uživatele, akorát jinak pojmenovaný.
+        Button changePicture = new Button("Změna obrázku filmu");
+        changePicture.setOnAction(event -> {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Vyberte nový obrázek pro film");
+            fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Obrázky","*.png"));
+            File selectedFile = fileChooser.showOpenDialog(stage);
+            String photoName = new String(currentMovieString+".png");
+            if (selectedFile != null) {
+                try {
+                    // Načtení vybraného souboru do byte array
+                    byte[] fileContent = Files.readAllBytes(selectedFile.toPath());
+                    // Zapsání byte array do resource složky
+                    Path resourceFolder = Paths.get("src/main/resources/movies");
+                    Files.write(resourceFolder.resolve(photoName), fileContent);
+                    showMovieDetails(stage);
+
+                } catch (IOException e) {
+                    Alert alertSomethingIsWrongICanFeelIt = new Alert(Alert.AlertType.ERROR, "Něco se pokazilo, opakuj nahrání obrázku.");
+                    alertSomethingIsWrongICanFeelIt.show();
+                }
+            }
+        });
+
+        //Tlacitko na vraceni se na main page z detailů filmu
+        Button backFromDetail = new Button("Zpět do databáze");
+        backFromDetail.setOnAction(event -> {
+            showMovieDatabase(stage);
+            System.gc();
+        });
+        //Tlačítko pro vytvoření recenze k filmu
+
+
+        // Vytvořžení Labelu o informacich filmu, nastavení maximální šířky pro wrapper, nastavení HBoxu a věcí kolem
+        //  Je to zmatečný, ale funguje to. Lituji těch, co to budou stylovat.
+        Label movieDetailLabel = new Label("Detaily filmu: " + currentMovieString);
+        movieDetailLabel.setFont(Font.font("Arial", FontWeight.BOLD, 25));
+        Label director = new Label("Režisér: ");
+        Label movieDirector = new Label(currentMovie.getDirector());
+        director.setFont(Font.font("Arial", FontWeight.BOLD, 13));
+        Label year = new Label("Rok vydání: ");
+        year.setFont(Font.font("Arial", FontWeight.BOLD, 13));
+        Label movieYear = new Label(Integer.toString(currentMovie.getYear()));
+        Label infoLabel = new Label(currentMovie.getInfo());
+        infoLabel.setWrapText(true);
+        infoLabel.setMaxWidth(750);
+        movieDetailLeftBox.getChildren().addAll(movieImage, director, movieDirector, year, movieYear);
+        movieDetailLeftBox.setPadding(new Insets(0,10,0,0));
+        movieDetailsVBox.getChildren().addAll(infoLabel, movieDetailReview);
+        movieDetailHBox.getChildren().addAll(backFromDetail, changePicture);
+        HBox hBoxTop = new HBox(movieDetailLabel);
+        infoLabel.setPadding(new Insets(0,0,10,0));
+
+        borderPaneMovieDetail.setTop(hBoxTop);
+        hBoxTop.setAlignment(Pos.CENTER);
+        movieDetailHBox.setAlignment(Pos.CENTER);
+        movieDetailHBox.setPadding(new Insets(10,0,0,0));
+        borderPaneMovieDetail.setLeft(movieDetailLeftBox);
+        borderPaneMovieDetail.setCenter(movieDetailsVBox);
+        borderPaneMovieDetail.setBottom(movieDetailHBox);
+        stage.setScene(movieScene);
+
+
+    }
+
+
     // Uživatelský panel, sloužící pro nastavení účtu.
     private void showUserPanelStage (Stage stage) throws IOException {
 
@@ -397,9 +534,9 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
         Image imageUser = null;
 
         try {
-            imageUser = new Image(new FileInputStream("src/main/resources/" +currentUser.getUsername()+ ".png"));
+            imageUser = new Image(new FileInputStream("src/main/resources/users/" + currentUser.getUsername() + ".png"));
         } catch (FileNotFoundException e) {
-            imageUser = new Image(Files.newInputStream(Paths.get("src/main/resources/host.png")));
+            imageUser = new Image(Files.newInputStream(Paths.get("src/main/resources/users/host.png")));
         }
         ImageView usersImage = new ImageView(imageUser);
         usersImage.setFitHeight(150);
@@ -429,7 +566,10 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
 
         //Tlačítko pro změnu hesla
         Button changePasswordButton = new Button("Změna hesla");
-        changePasswordButton.setOnAction(event -> changePasswordScene(stage));
+        changePasswordButton.setOnAction(event -> {
+            changePasswordScene(stage);
+
+        });
 
         Button goToMainStage = new Button("Zpět do hlavního menu");
         goToMainStage.setOnAction(event -> showMovieDatabase(stage));
@@ -447,7 +587,7 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
                     // Načtení vybraného souboru do byte array
                     byte[] fileContent = Files.readAllBytes(selectedFile.toPath());
                     // Zapsání byte array do resource složky
-                    Path resourceFolder = Paths.get("src/main/resources");
+                    Path resourceFolder = Paths.get("src/main/resources/users/");
                     Files.write(resourceFolder.resolve(photoName), fileContent);
                     showUserPanelStage(stage);
 
@@ -528,60 +668,7 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
 
     }
 
-    private void showDemoDatabase(Stage stage) {
-        //Ukazka demo databaze pro hosta, ukazuji se pouze seznamy filmu a je zde moznost vyhledavani
-        // Vytvoření tabulky filmů
-        BorderPane demoBorderPane = new BorderPane();
-        Scene demoScene = new Scene(demoBorderPane);
-        TableView<Movie> movieTable = new TableView<>();
 
-        TableColumn<Movie, String> titleColumn = new TableColumn<>("Název");
-        titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
-
-        TableColumn<Movie, Integer> yearColumn = new TableColumn<>("Rok");
-        yearColumn.setCellValueFactory(new PropertyValueFactory<>("year"));
-
-        TableColumn<Movie, String> directorColumn = new TableColumn<>("Režisér");
-        directorColumn.setCellValueFactory(new PropertyValueFactory<>("director"));
-
-        TableColumn<Movie, Integer> ratingColumn = new TableColumn<>("Hodnocení");
-        ratingColumn.setCellValueFactory(new PropertyValueFactory<>("hodnoceni"));
-
-        movieTable.getColumns().addAll(titleColumn, yearColumn, directorColumn, ratingColumn);
-
-        // Nastavení položek v tabulce na seznam filmů
-        movieTable.setItems(FXCollections.observableArrayList(movies));
-
-        // Vytvoření vyhledávacího panelu
-        TextField searchBar = new TextField();
-        searchBar.setPromptText("Hledej");
-        searchBar.textProperty().addListener((observable, oldValue, newValue) -> {
-            // Filtrování filmů na základě vyhledávacího dotazu
-            List<Movie> filteredMovies = movies.stream()
-                    .filter(movie -> movie.getTitle().contains(newValue) ||
-                            Integer.toString(movie.getYear()).contains(newValue) ||
-                            Float.toString(movie.getHodnoceni()).contains(newValue) ||
-                            movie.getDirector().contains(newValue))
-
-                    .collect(Collectors.toList());
-
-            // Nastavení položek v tabulce na filtrovaný seznam filmů
-            movieTable.setItems(FXCollections.observableArrayList(filteredMovies));
-        });
-        Button logoutButton = new Button("Odhlásit se z účtu Host");
-        logoutButton.setOnAction(event -> {
-            currentUser = null;
-
-            start(stage);
-        });
-        VBox container = new VBox(movieTable, searchBar, logoutButton);
-        container.setSpacing(10);
-        container.setPadding(new Insets(10));
-
-        demoBorderPane.setCenter(container);
-        stage.setScene(demoScene);
-        stage.show();
-    }
     private void showRegistrationForm(Stage stage) {
         // Vytvoření registračního formuláře
         TextField usernameInput = new TextField();
@@ -654,6 +741,11 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
         stage.setScene(new Scene(registrationForm));
         stage.getIcons().add(image);
         stage.show();
+
+
+    }
+    public User loadCurrenyUser() {
+    return currentUser;
     }
 
 }

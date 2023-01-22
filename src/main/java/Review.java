@@ -56,4 +56,9 @@ public class Review {
 
     public void setRevHodnoceni(float revHodnoceni) {this.revHodnoceni = revHodnoceni;}
 
+    @Override
+    public String toString() {
+        return textRecenze;
+    }
+
 }
