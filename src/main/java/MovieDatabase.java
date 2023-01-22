@@ -518,9 +518,8 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
         movieDetailReview.setItems(FXCollections.observableArrayList(reviews));
         List<Review> filteredReviews = reviews.stream().filter(review -> review.getReviewedMovie().contains(currentMovieString)).collect(Collectors.toList());
         movieDetailReview.setItems(FXCollections.observableArrayList(filteredReviews));
-
         //Tlačítko pro změnu obrázku filmu, jedno a to samý co u uživatele, akorát jinak pojmenovaný.
-        Button changePicture = new Button("Změna obrázku filmu");
+        Button changePicture = new Button("\uD83D\uDD04 Změnit obrázek");
         changePicture.setOnAction(event -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Vyberte nový obrázek pro film");
@@ -544,13 +543,13 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
         });
 
         //Tlacitko na vraceni se na main page z detailů filmu
-        Button backFromDetail = new Button("Zpět do databáze");
+        Button backFromDetail = new Button("↩ Zpět");
         backFromDetail.setOnAction(event -> {
             showMovieDatabase(stage);
             System.gc();
         });
         //Tlačítko pro vytvoření recenze k filmu
-        Button addReview = new Button("Přidat recenzi");
+        Button addReview = new Button("➕ Přidat recenzi");
         addReview.setOnAction(event -> {
             showAddReviewStage(stage);
         });
@@ -558,7 +557,7 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
 
         // Vytvořžení Labelu o informacich filmu, nastavení maximální šířky pro wrapper, nastavení HBoxu a věcí kolem
         //  Je to zmatečný, ale funguje to. Lituji těch, co to budou stylovat.
-        Label movieDetailLabel = new Label("Detaily filmu: " + currentMovieString);
+        Label movieDetailLabel = new Label(currentMovieString);
         movieDetailLabel.setFont(Font.font("Arial", FontWeight.BOLD, 25));
         Label director = new Label("Režisér: ");
         Label movieDirector = new Label(currentMovie.getDirector());
@@ -566,18 +565,18 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
         Label year = new Label("Rok vydání: ");
         year.setFont(Font.font("Arial", FontWeight.BOLD, 13));
         Label movieYear = new Label(Integer.toString(currentMovie.getYear()));
+        Label obsahLabel = new Label("Obsah:");
+        obsahLabel.setFont(Font.font("Arial", FontWeight.BOLD, 20));
         Label infoLabel = new Label(currentMovie.getInfo());
         infoLabel.setWrapText(true);
         infoLabel.setMaxWidth(750);
-        movieDetailLeftBox.getChildren().addAll(movieImage, director, movieDirector, year, movieYear);
-        movieDetailLeftBox.setPadding(new Insets(0,10,0,0));
-        movieDetailsVBox.getChildren().addAll(infoLabel, movieDetailReview);
-        movieDetailHBox.getChildren().addAll(backFromDetail, changePicture, addReview);
-        HBox hBoxTop = new HBox(movieDetailLabel);
+        movieDetailLeftBox.getChildren().addAll(movieImage,movieDetailLabel, director, movieDirector, year, movieYear,addReview,changePicture);
+        movieDetailLeftBox.setPadding(new Insets(0,10,10,0));
+        movieDetailLeftBox.setSpacing(8);
+        movieDetailsVBox.getChildren().addAll(obsahLabel,infoLabel, movieDetailReview);
+        movieDetailHBox.getChildren().addAll(backFromDetail);
         infoLabel.setPadding(new Insets(0,0,10,0));
 
-        borderPaneMovieDetail.setTop(hBoxTop);
-        hBoxTop.setAlignment(Pos.CENTER);
         movieDetailHBox.setAlignment(Pos.CENTER);
         movieDetailHBox.setPadding(new Insets(10,0,0,0));
         borderPaneMovieDetail.setLeft(movieDetailLeftBox);
@@ -596,10 +595,10 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
         Stage reviewStage = new Stage();
         VBox reviewVBox = new VBox();
         HBox reviewHBox = new HBox();
-        Label labelTop = new Label("Přidání recenze pro "+ currentMovieString);
-        labelTop.setFont(Font.font("Arial", FontWeight.BOLD, 25));
+        Label labelTop = new Label("Přidat recenzi pro "+ currentMovieString);
+        labelTop.setFont(Font.font("Arial", FontWeight.BOLD, 20));
 
-        Button goBackButton = new Button("Zrušit");
+        Button goBackButton = new Button("✖ Zrušit");
         goBackButton.setOnAction(event -> {
             reviewStage.close();
         });
@@ -619,7 +618,7 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
         revHodnoceniSlider.setShowTickMarks(true);
 
 
-        Button addButton = new Button("Přidat recenzi");
+        Button addButton = new Button("➕ Přidat recenzi");
         addButton.setOnAction(event -> {
             // Vytvoření nového filmu se vstupními hodnotami
             Double doubleToFloat = revHodnoceniSlider.getValue();
@@ -644,16 +643,21 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
             }
         });
         textRecenzeInput.setMinSize(360,200);
-        hodnoceniFilmu.setPadding(new Insets(0,0,20,0));
+        hodnoceniFilmu.setPadding(new Insets(5,0,5,0));
         reviewHBox.getChildren().setAll(goBackButton, addButton);
+        reviewHBox.setSpacing(8);
         reviewVBox.getChildren().setAll(textRecenzeInput,hodnoceniFilmu, revHodnoceniSlider);
+
         borderPaneAddReview.setTop(labelTop);
+        labelTop.setPadding(new Insets(0,0,10,0));
         labelTop.setAlignment(Pos.CENTER);
         reviewHBox.setAlignment(Pos.CENTER);
         borderPaneAddReview.setCenter(reviewVBox);
         borderPaneAddReview.setBottom(reviewHBox);
         reviewStage.setScene(movieScene);
         reviewStage.initModality(Modality.APPLICATION_MODAL);
+        Image image = new Image("file:src/main/resources/logo.png");
+        reviewStage.getIcons().add(image);
         reviewStage.show();
     }
 
