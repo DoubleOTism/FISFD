@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="ArrayList" type="ArrayListType"/>
+    <xs:complexType name="ArrayListType">
+        <xs:sequence>
+            <xs:element name="movie" type="movieType" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="movie" type="movieType"/>
+    <xs:complexType name="movieType">
+        
+        <xs:sequence>
+            <xs:element name="title" minOccurs="1">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:pattern value="[0-9ěščřžýáíéóúůďťňĎŇŤŠČŘŽÝÁÍÉÚŮĚÓa-zA-Z -,. ]{0,30}"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="year" minOccurs="1">
+                <xs:simpleType>
+                    <xs:restriction base="xs:gYear">
+                        <xs:minInclusive value="1920"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            
+            <xs:element name="director" minOccurs="1">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="50" />
+                    </xs:restriction>
+                </xs:simpleType>
+                
+            </xs:element>
+            <xs:element name="rating" minOccurs="0">
+                <xs:simpleType>
+                    <xs:restriction base="xs:float">
+                        <xs:minInclusive value="0"/>
+                        <xs:maxInclusive value="5"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            
+            <xs:element name="info" minOccurs="0">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:pattern value="[0-9ěščřžýáíéóúůďťňĎŇŤŠČŘŽÝÁÍÉÚŮĚÓa-zA-Z -,. ]{0,999}"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>
