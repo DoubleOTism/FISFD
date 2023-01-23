@@ -69,9 +69,11 @@ public class MovieDatabase extends Application {
 
     private Movie currentMovie;
     private Movie vybranejFilm;
+    TableView<Review> usersReviews = new TableView<>();
     private Movie selectedMovieAdd;
     TableView<Movie> movieTable = new TableView<>();
     TableView<Movie> myMovieTable = new TableView<>();
+    private Review selectedReview;
 
 
     private String currentMovieString;
@@ -359,7 +361,7 @@ public class MovieDatabase extends Application {
                     .filter(movie -> movie.getTitle().contains(newValue) ||
                             Integer.toString(movie.getYear()).contains(newValue) ||
                             Float.toString(movie.getHodnoceni()).contains(newValue) ||
-                            movie.getDirector().contains(newValue))
+                            movie.getDirector().contains(newValue)  || movie.getZanr().contains(newValue))
 
                     .collect(Collectors.toList());
 
@@ -522,6 +524,18 @@ public class MovieDatabase extends Application {
             }
         });
     }
+
+    private void removeReviewFromList() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Jste si jisti, že chcete tuto recenzi odstranit?");
+        alert.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                reviews.remove(selectedReview);
+                deleteMyReview();
+                loadReviews();
+                usersReviews.setItems(FXCollections.observableArrayList(reviews));
+            }
+        });
+    }
     private void setTable() {
         TableColumn<Movie, String> titleColumn = new TableColumn<>("Název");
         titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
@@ -534,8 +548,10 @@ public class MovieDatabase extends Application {
 
         TableColumn<Movie, Integer> ratingColumn = new TableColumn<>("Naše hodnocení");
         ratingColumn.setCellValueFactory(new PropertyValueFactory<>("hodnoceni"));
+        TableColumn<Movie, Integer> genreColumn = new TableColumn<>("Žánr filmu:");
+        genreColumn.setCellValueFactory(new PropertyValueFactory<>("zanr"));
 
-        movieTable.getColumns().addAll(titleColumn, yearColumn, directorColumn, ratingColumn);
+        movieTable.getColumns().addAll(titleColumn, yearColumn, directorColumn,genreColumn, ratingColumn);
         movieTable.setLayoutX(20);
         movieTable.setLayoutY(110);
         movieTable.setPrefHeight(480);
@@ -553,10 +569,14 @@ public class MovieDatabase extends Application {
 
         TableColumn<Movie, String> myDirectorColumn = new TableColumn<>("Režisér");
         myDirectorColumn.setCellValueFactory(new PropertyValueFactory<>("director"));
+
+        TableColumn<Movie, Integer> myGenreColumn = new TableColumn<>("Žánr filmu:");
+        myGenreColumn.setCellValueFactory(new PropertyValueFactory<>("zanr"));
+
         TableColumn<Movie, String> myStatusColumn = new TableColumn<>("Status filmu");
         myStatusColumn.setCellValueFactory(new PropertyValueFactory<>("info"));
 
-        myMovieTable.getColumns().addAll(myTitleColumn, myDirectorColumn, myYearColumn, myStatusColumn);
+        myMovieTable.getColumns().addAll(myTitleColumn, myYearColumn, myDirectorColumn,myGenreColumn, myStatusColumn);
         myMovieTable.setLayoutX(20);
         myMovieTable.setLayoutY(110);
         myMovieTable.setPrefHeight(480);
@@ -587,6 +607,10 @@ public class MovieDatabase extends Application {
 
         TextArea infoInput = new TextArea();
         infoInput.setPromptText("Info o filmu, jeho obsah");
+        Label zanrLabel = new Label("Žánr filmu");
+        ComboBox zanrBox = new ComboBox<>();
+        zanrBox.setValue("Nebylo určeno");
+        zanrBox.getItems().addAll("Akční", "Komedie", "Sci-FI", "Drama", "Horor", "Thriller", "Krimi");
 
         Label hodnoceniFilmu = new Label("Bodové hodnocení filmu: ");
 
@@ -604,7 +628,7 @@ public class MovieDatabase extends Application {
             Float convertedDouble = doubleToFloat.floatValue();
             // Vytvoření nového filmu se vstupními hodnotami
             try {
-                Movie movie = new Movie(titleInput.getText(), Integer.parseInt(yearInput.getText()), directorInput.getText(), convertedDouble, infoInput.getText());
+                Movie movie = new Movie(titleInput.getText(), Integer.parseInt(yearInput.getText()), directorInput.getText(), convertedDouble, infoInput.getText(), zanrBox.getValue().toString());
                 try {
                     validateMovieAgainstXsd(movie);
                     // Přidání filmu do seznamu filmů
@@ -631,7 +655,7 @@ public class MovieDatabase extends Application {
             addMovie.close();
             System.gc();
         });
-        vBox.getChildren().addAll(addFilmLabel, titleInput, yearInput,directorInput, infoInput, hodnoceniFilmu, hodnoceniSlider);
+        vBox.getChildren().addAll(addFilmLabel, titleInput, yearInput,directorInput, infoInput, hodnoceniFilmu,zanrLabel, zanrBox, hodnoceniSlider);
         vBox.setAlignment(Pos.CENTER);
         vBox.setPadding(new Insets(10));
         hBox.getChildren().addAll(addButton, goBackButton);
@@ -792,6 +816,19 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
         }
     }
 
+    private void deleteMyReview() {
+        XmlMapper xmlMapper = new XmlMapper();
+        try {
+            // Write the updated list back to the file
+
+            xmlMapper.writeValue(REVIEW_FILE, reviews);
+            // Reload the movies list
+
+        } catch (IOException e) {
+            System.out.println("Error deleting review from file: " + e.getMessage());
+        }
+    }
+
 
 
     private void saveMovies() {
@@ -913,10 +950,11 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
         Button addToMyList = new Button("Přidat na můj seznam");
         ChoiceBox choiceBox = new ChoiceBox<>();
         choiceBox.getItems().addAll("Sleduji", "Nezajímá mne", "Plánuji sledovat");
+        choiceBox.setValue("Nevím");
         TextField statusFilmu = new TextField();
         statusFilmu.setPromptText("Status filmu");
         addToMyList.setOnAction(event -> {
-            Movie movie = new Movie(currentMovie.getTitle(), currentMovie.getYear(), currentMovie.getDirector(), currentMovie.getHodnoceni(), choiceBox.getValue().toString());
+            Movie movie = new Movie(currentMovie.getTitle(), currentMovie.getYear(), currentMovie.getDirector(), currentMovie.getHodnoceni(), choiceBox.getValue().toString(), currentMovie.getZanr());
             myMovies.add(movie);
             if (statusFilmu.getText().equals(null)) {
 
@@ -1055,7 +1093,6 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
         labelUserPanel.setFont(Font.font("Arial", FontWeight.BOLD, 25));
 
         //Výpis recenzí pro daného uživatele, pracuje se souborem review.xml, informace o uživateli zjišťuje pomocí lognutého jména.
-        TableView<Review> usersReviews = new TableView<>();
         TableColumn<Review, String> reviewColumn = new TableColumn<>("Recenze");
         reviewColumn.setCellValueFactory(new PropertyValueFactory<>("textRecenze"));
         TableColumn<Review, String> userColumn = new TableColumn<>("Uživatel");
@@ -1075,6 +1112,19 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
         changePasswordButton.setOnAction(event -> {
             changePasswordScene(stage);
 
+        });
+
+        // Tlačítko pro odebrání recenze
+        Button deleteButton = new Button("Odstranit recenzi");
+        deleteButton.setOnAction(event -> {
+
+            selectedReview = usersReviews.getSelectionModel().getSelectedItem();
+
+            if (selectedReview != null) {
+
+                removeReviewFromList();
+                usersReviews.setItems(FXCollections.observableArrayList(reviews));
+            }
         });
 
         Button goToMainStage = new Button("Zpět do hlavního menu");
@@ -1114,7 +1164,7 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
         leftPanelUser.setPadding(new Insets(10));
 
 
-        labelUserPanel.setPadding(new Insets(20, 0, 300, 0));
+        labelUserPanel.setPadding(new Insets(20, 0, 50, 0));
         changePasswordButton.setPadding(new Insets(10));
         goToMainStage.setPadding(new Insets(10));
         changePicture.setPadding(new Insets(10));
@@ -1122,7 +1172,7 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
 
 
 
-        leftPanelUser.getChildren().setAll(usersImage, labelUserPanel, changePasswordButton, goToMainStage, changePicture);
+        leftPanelUser.getChildren().setAll(usersImage, labelUserPanel, changePasswordButton, goToMainStage, changePicture, deleteButton);
         borderPaneUserPanel.setLeft(leftPanelUser);
         borderPaneUserPanel.setCenter(usersReviews);
         stage.setScene(userScene);

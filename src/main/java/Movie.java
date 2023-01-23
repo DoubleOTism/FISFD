@@ -21,18 +21,23 @@ public class Movie {
     @JsonProperty(required = false)
     private String info;
 
+    @JacksonXmlProperty(localName = "zanr")
+    @JsonProperty(required = false)
+    private String zanr;
+
     // NEMAZAT!!
     public Movie() {
         // Výchozí konstruktor, který Jackson potřebuje pro deserializaci
 
     }
 
-    public Movie(String title, int year, String director, float hodnoceni, String info) {
+    public Movie(String title, int year, String director, float hodnoceni, String info, String zanr) {
         this.title = title;
         this.year = year;
         this.director = director;
         this.hodnoceni = hodnoceni;
         this.info = info;
+        this.zanr = zanr;
     }
 
 
@@ -66,5 +71,8 @@ public class Movie {
 
     public String getInfo() {return info;}
     public void setInfo() {this.info = info;}
+
+    public String getZanr() {return zanr;}
+    public void setZanr() {this.zanr = zanr;}
 
 }
