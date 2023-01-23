@@ -244,7 +244,7 @@ public class MovieDatabase extends Application {
 //search Field
 
         TextField searchField = new TextField();
-        searchField.setLayoutX(104);
+        searchField.setLayoutX(193);
         searchField.setLayoutY(9);
         searchField.setPrefHeight(25);
         searchField.setPrefWidth(144);
@@ -309,7 +309,7 @@ public class MovieDatabase extends Application {
         ImageView searchIcon = new ImageView();
         searchIcon.setFitHeight(14);
         searchIcon.setFitWidth(14);
-        searchIcon.setLayoutX(80);
+        searchIcon.setLayoutX(170);
         searchIcon.setLayoutY(15);
         Image image2 = new Image(getClass().getResourceAsStream("src/main/resources/searchIcon.png"));
         searchIcon.setImage(image2);
@@ -331,6 +331,14 @@ public class MovieDatabase extends Application {
         logout.setLayoutY(55);
         Image image4 = new Image(getClass().getResourceAsStream("src/main/resources/logout.png"));
         logout.setImage(image4);
+
+        ImageView fisfdLogo = new ImageView();
+        fisfdLogo.setFitHeight(46);
+        fisfdLogo.setPreserveRatio(true);
+        fisfdLogo.setLayoutX(20);
+        fisfdLogo.setLayoutY(0);
+        Image fisfdImage = new Image(getClass().getResourceAsStream("src/main/resources/fisfdLogo.png"));
+        fisfdLogo.setImage(fisfdImage);
 
         Button profileButton = new Button();
         profileButton.setLayoutX(760);
@@ -486,7 +494,7 @@ public class MovieDatabase extends Application {
 
         // Nastavení scény a zobrazení filmové databáze
         root.getChildren().add(anchorPane);
-        anchorPane.getChildren().addAll(mojeFilmy, hlavniLine, mojeFilmyLine, hlavniStrana, topBarRect, searchField, imageViewoptions, xBoxFilmu, searchIcon,  horniMenu, optionsButton, addMovieForm, movieTable, myMovieTable);
+        anchorPane.getChildren().addAll(mojeFilmy, hlavniLine, mojeFilmyLine, hlavniStrana, topBarRect, searchField, imageViewoptions, xBoxFilmu, searchIcon,  horniMenu, optionsButton, addMovieForm, movieTable, myMovieTable, fisfdLogo);
         stage.setScene(new Scene(root));
         stage.show();
 
