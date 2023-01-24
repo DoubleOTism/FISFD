@@ -18,3 +18,8 @@ Uživatel si při registraci bude moci vybrat jaké žánry preferuje a zárove�
 * Jako neregistrovaný uživatel si chci zobrazit filmovou databázi, filtrovat si jí podle žánrů.
 * Jako registrovaný a přihlášený uživatel si chci vytvořit list filmů na které se chci dívat, které aktuálně sleduju, a které sem již viděl.   
 * Jako registrovaný uživatel chci aby mi aplikace doporučija film dle mého oblíbého žánru.
+
+# Deployment 
+Pro automatické tvoření jar souborů z naší aplikace používáme Maven v kombinaci s gitlab CI/CD.
+V Mavenu jsou nastavené všechny potřebné dependencies pro správné fungování aplikace a následně pluginem maven-assembly-plugin nastavena tvorba fat jaru, tzn. jar file který obsahuje všechny potřebné dependencies v sobě zakomponované. Následně pomocí gitlab-ci.yml souboru je nastaveno, že po každém commitu se má kompilovat nový jar soubor pomocí mvn package (gitlab si pomocí docker containeru všechno buildne). 
+Aktuální limitace jsou v načítání XML databází, problém s jar pathama. 
