@@ -473,6 +473,9 @@ public class MovieDatabase extends Application {
             // Vymazání aktuálního uživatele a zobrazení přihlašovacího formuláře
             currentUser = null;
             start(stage);
+            myMovieTable.setItems(FXCollections.observableArrayList(myMovies));
+            movieTable.setItems(FXCollections.observableArrayList(movies));
+
         });
 
         //Vytvoreni tlacitka pro pridani na muj list
@@ -537,6 +540,7 @@ public class MovieDatabase extends Application {
                 loadReviews();
                 usersReviews.setItems(FXCollections.observableArrayList(reviews));
             }
+            movieTable.getColumns().clear();
         });
     }
     private void setTable() {
@@ -961,6 +965,7 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
         ChoiceBox choiceBox = new ChoiceBox<>();
         choiceBox.getItems().addAll("Sleduji", "Nezajímá mne", "Plánuji sledovat");
         choiceBox.setValue("Nevím");
+        Label label = new Label("Status filmu:");
         TextField statusFilmu = new TextField();
         statusFilmu.setPromptText("Status filmu");
         addToMyList.setOnAction(event -> {
@@ -972,6 +977,8 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
                 try {
                     validateMyMovieAgainstXsd(movie);
                     myMovieTable.setItems(FXCollections.observableArrayList(myMovies));
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION, "Film " + currentMovie.getTitle() + " byl přidán do seznamu vašich filmů se statusem " + choiceBox.getValue().toString());
+                    alert.show();
                 } catch (SAXException e) {
                     throw new RuntimeException(e);
                 } catch (IOException e) {
@@ -1005,7 +1012,7 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
         anchorPane.getChildren().addAll(redBar,fisfdLogo);
         anchorPane.setPadding(new Insets(0,0,10,0));
 
-        movieDetailLeftBox.getChildren().addAll(movieImage,movieDetailLabel, director, movieDirector, year, movieYear,addReview,changePicture, addToMyList, choiceBox);
+        movieDetailLeftBox.getChildren().addAll(movieImage,movieDetailLabel, director, movieDirector, year, movieYear,addReview,changePicture, addToMyList, label, choiceBox);
         movieDetailLeftBox.setPadding(new Insets(0,10,10,0));
         movieDetailLeftBox.setSpacing(8);
         movieDetailHBox.setAlignment(Pos.CENTER);
@@ -1200,6 +1207,7 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
         changePasswordButton.setPadding(new Insets(10));
         goToMainStage.setPadding(new Insets(10));
         changePicture.setPadding(new Insets(10));
+        deleteButton.setPadding(new Insets(10));
         leftPanelUser.setSpacing(10);
 
 

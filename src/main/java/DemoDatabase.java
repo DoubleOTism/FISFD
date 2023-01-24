@@ -87,6 +87,7 @@ public class DemoDatabase {
 
         demoBorderPane.setCenter(container);
         stage.setScene(demoScene);
+        stage.setWidth(600);
         stage.show();
     }
 }

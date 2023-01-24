@@ -15,6 +15,7 @@
     <bytecodeTargetLevel>
       <module name="fisfd-final" target="8" />
       <module name="fisfd-xsd" target="8" />
+      <module name="movie-db" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>
