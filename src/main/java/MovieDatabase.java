@@ -565,6 +565,8 @@ public class MovieDatabase extends Application {
     }
 
     private void setMyTable() {
+        myMovieTable.getColumns().clear();
+
         // Vytvoření tabulky moje filmy
 
         TableColumn<Movie, String> myTitleColumn = new TableColumn<>("Název");
