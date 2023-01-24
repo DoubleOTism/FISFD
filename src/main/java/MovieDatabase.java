@@ -540,6 +540,8 @@ public class MovieDatabase extends Application {
         });
     }
     private void setTable() {
+        movieTable.getColumns().clear();
+
         TableColumn<Movie, String> titleColumn = new TableColumn<>("Název");
         titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
 
@@ -554,7 +556,7 @@ public class MovieDatabase extends Application {
 
         TableColumn<Movie, Integer> genreColumn = new TableColumn<>("Žánr filmu:");
         genreColumn.setCellValueFactory(new PropertyValueFactory<>("zanr"));
-
+        
         movieTable.getColumns().addAll(titleColumn, yearColumn, directorColumn,genreColumn, ratingColumn);
         movieTable.setLayoutX(20);
         movieTable.setLayoutY(110);

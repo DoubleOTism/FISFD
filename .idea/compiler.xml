@@ -8,10 +8,12 @@
         <outputRelativeToContentRoot value="true" />
         <module name="fisfd-xsd" />
         <module name="fisfd" />
+        <module name="fisfd-final" />
         <module name="movie-db" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="fisfd-final" target="8" />
       <module name="fisfd-xsd" target="8" />
     </bytecodeTargetLevel>
   </component>
