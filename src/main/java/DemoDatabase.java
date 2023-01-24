@@ -46,7 +46,10 @@ public class DemoDatabase {
         TableColumn<Movie, Integer> ratingColumn = new TableColumn<>("Hodnocení");
         ratingColumn.setCellValueFactory(new PropertyValueFactory<>("hodnoceni"));
 
-        movieTable.getColumns().addAll(titleColumn, yearColumn, directorColumn, ratingColumn);
+        TableColumn<Movie, Integer> genreColumn = new TableColumn<>("Žánr filmu:");
+        genreColumn.setCellValueFactory(new PropertyValueFactory<>("zanr"));
+
+        movieTable.getColumns().addAll(titleColumn, yearColumn, directorColumn, genreColumn, ratingColumn);
 
         // Nastavení položek v tabulce na seznam filmů
         movieTable.setItems(FXCollections.observableArrayList(movies));
@@ -60,7 +63,7 @@ public class DemoDatabase {
                     .filter(movie -> movie.getTitle().contains(newValue) ||
                             Integer.toString(movie.getYear()).contains(newValue) ||
                             Float.toString(movie.getHodnoceni()).contains(newValue) ||
-                            movie.getDirector().contains(newValue))
+                            movie.getDirector().contains(newValue)  || movie.getZanr().contains(newValue))
 
                     .collect(Collectors.toList());
 

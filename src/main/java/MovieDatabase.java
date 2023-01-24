@@ -551,6 +551,7 @@ public class MovieDatabase extends Application {
 
         TableColumn<Movie, Integer> ratingColumn = new TableColumn<>("Naše hodnocení");
         ratingColumn.setCellValueFactory(new PropertyValueFactory<>("hodnoceni"));
+
         TableColumn<Movie, Integer> genreColumn = new TableColumn<>("Žánr filmu:");
         genreColumn.setCellValueFactory(new PropertyValueFactory<>("zanr"));
 
