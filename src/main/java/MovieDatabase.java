@@ -614,7 +614,7 @@ public class MovieDatabase extends Application {
         Label zanrLabel = new Label("Žánr filmu");
         ComboBox zanrBox = new ComboBox<>();
         zanrBox.setValue("Nebylo určeno");
-        zanrBox.getItems().addAll("Akční", "Komedie", "Sci-FI", "Drama", "Horor", "Thriller", "Krimi");
+        zanrBox.getItems().addAll("Akční", "Komedie", "SciFI", "Drama", "Horor", "Thriller", "Krimi");
 
         Label hodnoceniFilmu = new Label("Bodové hodnocení filmu: ");
 
