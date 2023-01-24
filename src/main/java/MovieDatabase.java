@@ -869,6 +869,8 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
         HBox movieDetailHBox = new HBox();
         movieDetailsVBox.setMinWidth(800);
 
+
+
         //Load obrazku filmu, pokud neni zadny obrazek definovany uzivatelem, nacte default obrazek.
         Image imageMovie = null;
 
@@ -980,6 +982,29 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
             }
 
         });
+
+        Rectangle redBar = new Rectangle();
+        redBar.setArcHeight(5);
+        redBar.setArcWidth(5);
+        redBar.setFill(Color.web("#ba0305"));
+        redBar.setHeight(38);
+        redBar.setStroke(Color.web("#837272"));
+        redBar.setStrokeType(StrokeType.INSIDE);
+        redBar.setStrokeWidth(0);
+        redBar.setWidth(1050);
+
+        ImageView fisfdLogo = new ImageView();
+        fisfdLogo.setFitHeight(40);
+        fisfdLogo.setPreserveRatio(true);
+        fisfdLogo.setLayoutX(0);
+        fisfdLogo.setLayoutY(0);
+        Image fisfdImage = new Image(getClass().getResourceAsStream("src/main/resources/fisfdLogo.png"));
+        fisfdLogo.setImage(fisfdImage);
+
+        AnchorPane anchorPane = new AnchorPane();
+        anchorPane.getChildren().addAll(redBar,fisfdLogo);
+        anchorPane.setPadding(new Insets(0,0,10,0));
+
         movieDetailLeftBox.getChildren().addAll(movieImage,movieDetailLabel, director, movieDirector, year, movieYear,addReview,changePicture, addToMyList, choiceBox);
         movieDetailLeftBox.setPadding(new Insets(0,10,10,0));
         movieDetailLeftBox.setSpacing(8);
@@ -988,6 +1013,8 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
         borderPaneMovieDetail.setLeft(movieDetailLeftBox);
         borderPaneMovieDetail.setCenter(movieDetailsVBox);
         borderPaneMovieDetail.setBottom(movieDetailHBox);
+        borderPaneMovieDetail.setTop(anchorPane);
+
         stage.setScene(movieScene);
 
 
