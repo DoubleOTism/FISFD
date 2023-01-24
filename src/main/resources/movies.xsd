@@ -45,7 +45,7 @@
             <xs:element name="info" minOccurs="0">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:pattern value="[0-9ěščřžýáíéóúůďťňĎŇŤŠČŘŽÝÁÍÉÚŮĚÓa-zA-Z -,. ]{0,999}"/>
+
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
@@ -53,7 +53,7 @@
             <xs:element name="zanr" minOccurs="0">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:pattern value="[0-9ěščřžýáíéóúůďťňĎŇŤŠČŘŽÝÁÍÉÚŮĚÓa-zA-Z -,. ]{0,999}"/>
+                        <xs:pattern value="[0-9ěščřžýáíéóúůďťňĎŇŤŠČŘŽÝÁÍÉÚŮĚÓa-zA-Z -,. ]{0,50}"/>
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
