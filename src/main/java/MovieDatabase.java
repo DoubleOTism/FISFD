@@ -139,9 +139,8 @@ public class MovieDatabase extends Application {
         });
         Button guestButton = new Button("Pokračovat jako host");
         guestButton.setOnAction(event -> {
-            User guest = new User("guest","guest");
-            currentUser = guest;
-            DemoDatabase demo = null;
+            currentUser = new User("guest","guest");
+            DemoDatabase demo;
             try {
                 demo = new DemoDatabase(stage, movies, currentUser);
             } catch (URISyntaxException e) {
@@ -256,7 +255,7 @@ public class MovieDatabase extends Application {
         imageViewoptions.setLayoutY(14);
 
 
-        Image optionsIcon = new Image(getClass().getResourceAsStream("src/main/resources/options.png"));
+        Image optionsIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("src/main/resources/options.png")));
         imageViewoptions.setImage(optionsIcon);
 // side menu nahore vpravo, defaultne je neviditelne, po kliknuti ikonky profile zobrazit
 
@@ -303,7 +302,7 @@ public class MovieDatabase extends Application {
         xButton.setFitWidth(21);
         xButton.setLayoutX(611);
         xButton.setLayoutY(8);
-        Image image1 = new Image(getClass().getResourceAsStream("src/main/resources/xButton.png"));
+        Image image1 = new Image(Objects.requireNonNull(getClass().getResourceAsStream("src/main/resources/xButton.png")));
         xButton.setImage(image1);
 
         ImageView searchIcon = new ImageView();
@@ -311,7 +310,7 @@ public class MovieDatabase extends Application {
         searchIcon.setFitWidth(14);
         searchIcon.setLayoutX(170);
         searchIcon.setLayoutY(15);
-        Image image2 = new Image(getClass().getResourceAsStream("src/main/resources/searchIcon.png"));
+        Image image2 = new Image(Objects.requireNonNull(getClass().getResourceAsStream("src/main/resources/searchIcon.png")));
         searchIcon.setImage(image2);
 
 
@@ -320,7 +319,7 @@ public class MovieDatabase extends Application {
         profile.setFitWidth(16);
         profile.setLayoutX(614);
         profile.setLayoutY(32);
-        Image image3 = new Image(getClass().getResourceAsStream("src/main/resources/profileWhite.png"));
+        Image image3 = new Image(Objects.requireNonNull(getClass().getResourceAsStream("src/main/resources/profileWhite.png")));
         profile.setImage(image3);
 
 
@@ -329,7 +328,7 @@ public class MovieDatabase extends Application {
         logout.setFitWidth(20);
         logout.setLayoutX(612);
         logout.setLayoutY(55);
-        Image image4 = new Image(getClass().getResourceAsStream("src/main/resources/logout.png"));
+        Image image4 = new Image(Objects.requireNonNull(getClass().getResourceAsStream("src/main/resources/logout.png")));
         logout.setImage(image4);
 
         ImageView fisfdLogo = new ImageView();
@@ -337,7 +336,7 @@ public class MovieDatabase extends Application {
         fisfdLogo.setPreserveRatio(true);
         fisfdLogo.setLayoutX(20);
         fisfdLogo.setLayoutY(0);
-        Image fisfdImage = new Image(getClass().getResourceAsStream("src/main/resources/fisfdLogo.png"));
+        Image fisfdImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("src/main/resources/fisfdLogo.png")));
         fisfdLogo.setImage(fisfdImage);
 
         Button profileButton = new Button();
@@ -405,9 +404,7 @@ public class MovieDatabase extends Application {
         deleteButtonMyMovie.setVisible(false);
 
         Button addMovieButton = new Button("Přidat film do databáze");
-        addMovieButton.setOnAction(event -> {
-            addMovieToDatabase(stage);
-        });
+        addMovieButton.setOnAction(event -> addMovieToDatabase(stage));
 //        prechod mezi hlavnim menu a moje filmy
         mojeFilmy.setOnAction(event -> {
             if (hlavniStrana.getTextFill().equals((Color.web("#ba0305"))))
@@ -501,9 +498,7 @@ public class MovieDatabase extends Application {
 
 
         // Nastavení scény a zobrazení filmové databáze
-        optionsButton.setOnMouseClicked(event -> {
-            horniMenu.setVisible(!horniMenu.isVisible());
-        });
+        optionsButton.setOnMouseClicked(event -> horniMenu.setVisible(!horniMenu.isVisible()));
 
     }
     /*confirmation box pro overeni odstraneni filmu po ok se vybrany film odstrani z movies a nasledne se zavola metoda deleteMovies() ktera zmenu zapise do XML souboru
@@ -632,8 +627,8 @@ public class MovieDatabase extends Application {
 
         Button addButton = new Button("Add Movie");
         addButton.setOnAction(event -> {
-            Double doubleToFloat = hodnoceniSlider.getValue();
-            Float convertedDouble = doubleToFloat.floatValue();
+            double doubleToFloat = hodnoceniSlider.getValue();
+            float convertedDouble = (float) doubleToFloat;
             // Vytvoření nového filmu se vstupními hodnotami
             try {
                 Movie movie = new Movie(titleInput.getText(), Integer.parseInt(yearInput.getText()), directorInput.getText(), convertedDouble, infoInput.getText(), zanrBox.getValue().toString());
@@ -872,7 +867,7 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
 
 
         //Load obrazku filmu, pokud neni zadny obrazek definovany uzivatelem, nacte default obrazek.
-        Image imageMovie = null;
+        Image imageMovie;
 
         try {
             imageMovie = new Image(new FileInputStream("src/main/resources/movies/" + currentMovieString + ".png"));
@@ -907,7 +902,7 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
             fileChooser.setTitle("Vyberte nový obrázek pro film");
             fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Obrázky","*.png"));
             File selectedFile = fileChooser.showOpenDialog(stage);
-            String photoName = new String(currentMovieString+".png");
+            String photoName = currentMovieString + ".png";
             if (selectedFile != null) {
                 try {
                     // Načtení vybraného souboru do byte array
@@ -1054,8 +1049,8 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
         Button addButton = new Button("➕ Přidat recenzi");
         addButton.setOnAction(event -> {
             // Vytvoření nového filmu se vstupními hodnotami
-            Double doubleToFloat = revHodnoceniSlider.getValue();
-            Float convertedDouble = doubleToFloat.floatValue();
+            double doubleToFloat = revHodnoceniSlider.getValue();
+            float convertedDouble = (float) doubleToFloat;
 
             Review review = new Review(currentMovieString, currentUser.getUsername(), textRecenzeInput.getText(), convertedDouble);
 
@@ -1144,10 +1139,7 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
 
         //Tlačítko pro změnu hesla
         Button changePasswordButton = new Button("Změna hesla");
-        changePasswordButton.setOnAction(event -> {
-            changePasswordScene(stage);
-
-        });
+        changePasswordButton.setOnAction(event -> changePasswordScene(stage));
 
         // Tlačítko pro odebrání recenze
         Button deleteButton = new Button("Odstranit recenzi");
@@ -1175,7 +1167,7 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
             fileChooser.setTitle("Vyberte si nový profilový obrázek");
             fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Obrázky","*.png"));
             File selectedFile = fileChooser.showOpenDialog(stage);
-            String photoName = new String(currentUser.getUsername()+".png");
+            String photoName = currentUser.getUsername() + ".png";
             if (selectedFile != null) {
                 try {
                     // Načtení vybraného souboru do byte array
@@ -1226,15 +1218,15 @@ data XML na seznam objektů. Pole Filmy a Uživatelé jsou pak nastavena na sezn
 
         Label changePasswordTopLabel = new Label("Změna hesla");
         changePasswordTopLabel.setFont(Font.font("Arial", FontWeight.BOLD, 25));
-        Button changePasswordButtonBack = new Button("Zpět");
         Button changePasswordButtonCommit = new Button("Změnit heslo");
+        Button changePasswordButtonBack = new Button("Zpět");
         PasswordField changePasswordOldPass = new PasswordField();
         PasswordField changePasswordNewPass = new PasswordField();
         PasswordField changePasswordNewPassConf = new PasswordField();
         Label changePasswordOldPassLabel = new Label("Staré heslo");
         Label changePasswordNewPassLabel = new Label("Nové heslo");
         Label changePasswordNewPassConfLabel = new Label("Nové heslo znovu");
-        changePasswordHBox.getChildren().setAll(changePasswordButtonBack, changePasswordButtonCommit);
+        changePasswordHBox.getChildren().setAll(changePasswordButtonCommit, changePasswordButtonBack);
         changePasswordVBox.getChildren().setAll(changePasswordTopLabel, changePasswordOldPassLabel, changePasswordOldPass,  changePasswordNewPassLabel, changePasswordNewPass, changePasswordNewPassConfLabel, changePasswordNewPassConf, changePasswordHBox);
 
         changePasswordButtonBack.setOnAction(event -> changePasswordStage.close());
