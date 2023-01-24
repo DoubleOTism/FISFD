@@ -29,7 +29,7 @@
             <xs:element name="textRecenze" minOccurs="1">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
-                        <xs:pattern value="[0-9ěščřžýáíéóúůďťňĎŇŤŠČŘŽÝÁÍÉÚŮĚÓa-zA-Z -,. ]{0,300}"/>
+                        
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
